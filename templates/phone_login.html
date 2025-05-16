@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phone Login</title>
+</head>
+<body>
+    <h1>Login with Phone</h1>
+    <div class="pe_signin_button" data-client-id="13173857965042182049"><script src="https://www.phone.email/sign_in_button_v1.js" async></script></div>
+
+    <script>
+    function phoneEmailListener(userObj) {
+        var user_json_url = userObj.user_json_url;
+        // Send the user JSON URL to your backend for further processing
+        fetch('/phone-callback/?user_json_url=' + encodeURIComponent(user_json_url))
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/home';  // Redirect to home or dashboard
+                } else {
+                    console.error('Failed to authenticate:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+
+        // Optional debug message (remove in production)
+        document.querySelector('.pe_signin_button').insertAdjacentHTML('beforeend', '<span>Phone Verification Successful! Read the user JSON URL from backend to get verified phone number - ' + user_json_url + '</span>');
+    }
+    </script>
+</body>
+</html>

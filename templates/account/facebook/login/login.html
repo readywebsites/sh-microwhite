@@ -1,0 +1,143 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+{% load static %}
+{% load socialaccount %}    
+
+<a href="{% provider_login_url 'facebook' %}">Login with Facebook</a>
+
+    <!-- BREADCRUMB AREA START -->
+    <div class="ltn__breadcrumb-area text-left bg-overlay-white-30 bg-image "  data-bs-bg="img/bg/14.jpg">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ltn__breadcrumb-inner">
+                        <h1 class="page-title">Account</h1>
+                        <div class="ltn__breadcrumb-list">
+                            <ul>
+                                <li><a href="index.html"><span class="ltn__secondary-color"><i class="fas fa-home"></i></span> Home</a></li>
+                                <li>Login</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- BREADCRUMB AREA END -->
+
+    <!-- LOGIN AREA START -->
+    <div class="ltn__login-area pb-65">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title-area text-center">
+                        <h1 class="section-title">Sign In <br>To  Your Account</h1>
+                        <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. <br>
+                             Sit aliquid,  Non distinctio vel iste.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="account-login-inner">
+
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                        <form method="post" action="" class="ltn__form-box contact-form-box">
+                            {% csrf_token %}
+
+                            <input type="hidden" name="next" value="{{ request.GET.next }}"> <!-- Include the next parameter -->
+
+                            <div class="btn-wrapper mt-0">
+                                <button class="theme-btn-1 btn btn-block" type="submit">Continue</button>
+                            
+                            </div>
+</form>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="account-create text-center pt-50">
+                        <h4>DON'T HAVE AN ACCOUNT?</h4>
+                        <p>Add items to your wishlistget personalised recommendations <br>
+                            check out more quickly track your orders register</p>
+                        <div class="btn-wrapper">
+                            <a href="register.html" class="theme-btn-1 btn black-btn">CREATE ACCOUNT</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- LOGIN AREA END -->
+
+    <!-- CALL TO ACTION START (call-to-action-6) -->
+    <div class="ltn__call-to-action-area call-to-action-6 before-bg-bottom" data-bs-bg="img/1.jpg--">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="call-to-action-inner call-to-action-inner-6 ltn__secondary-bg position-relative text-center---">
+                        <div class="coll-to-info text-color-white">
+                            <h1>Buy medical disposable face mask <br> to protect your loved ones</h1>
+                        </div>
+                        <div class="btn-wrapper">
+                            <a class="btn btn-effect-3 btn-white" href="shop.html">Explore Products <i class="icon-next"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- CALL TO ACTION END -->
+    <script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1489143238441291',
+      xfbml      : true,
+      version    : 'v20.0'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+<script>
+function phoneEmailListener(userObj) {
+    var user_json_url = userObj.user_json_url;
+    // Send the user JSON URL to your backend for further processing
+    fetch('/phone-callback/?user_json_url=' + encodeURIComponent(user_json_url))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/home';  // Redirect to home or dashboard
+            } else {
+                console.error('Failed to authenticate:', data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+
+    // Optional debug message (remove in production)
+    document.querySelector('.pe_signin_button').insertAdjacentHTML('beforeend', '<span>Phone Verification Successful! Read the user JSON URL from backend to get verified phone number - ' + user_json_url + '</span>');
+}
+</script>
+
+
+{% endblock %}
+

@@ -1,0 +1,1133 @@
+{% load static %}
+{% load custom_filters %}
+
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title> Sodam Oil</title>
+    <meta name="robots" content="noindex, follow" />
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Place favicon.png in the root directory -->
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="image/x-icon" />
+    <!-- Font Icons css -->
+    <link rel="stylesheet" href="{% static 'css/font-icons.css' %}">
+
+    <script src="https://kit.fontawesome.com/29045762a1.js" crossorigin="anonymous"></script>   
+    <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Responsive css -->
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- All JS Plugins -->
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <!-- Main JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Include Django CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+</head>
+
+<body>
+    <!--[if lte IE 9]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+    <![endif]-->
+
+    <!-- Add your site or application content here -->
+
+<!-- Body main wrapper start -->
+<div class="body-wrapper">
+
+    <!-- HEADER AREA START (header-3) -->
+    <header class="ltn__header-area ltn__header-3 section-bg-6---">   
+        <!-- ltn__header-top-area start -->
+        <div class="ltn__header-top-area border-bottom top-area-color-white---">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="ltn__top-bar-menu">
+                            <ul>
+                                <li><a href="mailto:info@webmail.com?Subject=Flower%20greetings%20to%20you"><i class="icon-mail"></i> sodamfoods@gmail.com</a></li>
+                                <li><a href="locations.html"><i class="icon-placeholder"></i> Kamrej, Surat, Gujarat</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="top-bar-right text-end">
+                            <div class="ltn__top-bar-menu">
+                                <ul>
+
+                                    <li>
+                                        <!-- ltn__social-media -->
+                                        <div class="ltn__social-media">
+                                            <ul>
+                                                <li><a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                                                <li><a href="#" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                                                
+                                                <li><a href="#" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+                                                <li><a href="#" title="Dribbble"><i class="fab fa-dribbble"></i></a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ltn__header-top-area end -->     
+        <!-- ltn__header-middle-area start -->
+        <div class="ltn__header-middle-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="site-logo">
+                            <a href="/"><img src="{% static 'img/logo5.png' %}" alt="Logo" style="width: 100px; height:auto;"></a>
+                        </div>
+                    </div>
+                    <div class="col header-contact-serarch-column d-none d-xl-block">
+                        <div class="header-contact-search">
+                            <!-- header-feature-item -->
+                            <div class="header-feature-item d-none">
+                                <div class="header-feature-icon">
+                                    <i class="icon-phone"></i>
+                                </div>
+                                <div class="header-feature-info">
+                                    <h6>Phone</h6>
+                                    <p><a href="tesl:0123456789">+0123-456-789</a></p>
+                                </div>
+                            </div>
+                            <!-- header-search-2 -->
+                            <div class="header-search-2">
+                                <form action="{% url 'search' %}">
+                                    <input type="text" name="q" value="" placeholder="Search here..."/>
+                                    <button type="submit">
+                                        <span><i class="icon-search"></i></span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <!-- header-options -->
+                        <div class="ltn__header-options">
+                            <ul>
+
+                                <li class="d-none--- ">
+                                    <!-- header-search-1 -->
+                                    <div class="header-search-wrap d-block d-xl-none">
+                                        <div class="header-search-1">
+                                            <div class="search-icon">
+                                                <i class="icon-search  for-search-show"></i>
+                                                <i class="icon-cancel  for-search-close"></i>
+                                            </div>
+                                        </div>
+                                        <div class="header-search-1-form">
+                                            <form id="#" method="get"  action="#">
+                                                <input type="text" name="search" value="" placeholder="Search here..."/>
+                                                <button type="submit">
+                                                    <span><i class="icon-search"></i></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="d-none---"> 
+                                    <!-- user-menu -->
+                                    <div class="ltn__drop-menu user-menu">
+                                        <ul>
+                                            <li>
+                                                <a href="#"><i class="icon-user"></i></a>
+                                                <ul>
+                                                    <li><a href="/accounts/login">Sign in</a></li>
+                                                    <li><a href="/accounts/signup">Register</a></li>
+                                                    <li><a href="/profile/">My Account</a></li>
+                                                    <li><a href="/wishlist/">Wishlist</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li>
+                                    <!-- mini-cart 2 -->
+                                    <div class="mini-cart-icon mini-cart-icon-2">
+                                        <a href="#ltn__utilize-cart-menu" class="ltn__utilize-toggle">
+                                            <span class="mini-cart-icon">
+                                                <i class="icon-shopping-cart"></i>
+                                                <sup id="cart-total-items">{{cart_items}}</sup>
+                                            </span>
+                                            <h6><span>Your Cart</span> <span class="ltn__secondary-color">₹{{total}}</span></h6>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ltn__header-middle-area end -->
+
+        <!-- MOBILE MENU START -->
+        <div class="mobile-header-menu-fullwidth mb-20 d-block d-lg-none">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <!-- Mobile Menu Button -->
+                        <div class="mobile-menu-toggle d-lg-none">
+                            <span>MENU</span>
+                            <a href="#ltn__utilize-mobile-menu" class="ltn__utilize-toggle">
+                                <svg viewBox="0 0 800 600">
+                                    <path d="M300,220 C300,220 520,220 540,220 C740,220 640,540 520,420 C440,340 300,200 300,200" id="top"></path>
+                                    <path d="M300,320 L540,320" id="middle"></path>
+                                    <path d="M300,210 C300,210 520,210 540,210 C740,210 640,530 520,410 C440,330 300,190 300,190" id="bottom" transform="translate(480, 320) scale(1, -1) translate(-480, -318) "></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- MOBILE MENU END -->
+        
+        <!-- header-bottom-area start -->
+        <div class="header-bottom-area ltn__border-top---   ltn__sticky-bg-white ltn__primary-bg---- menu-color-white---- d-none--- d-lg-block">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 align-self-center">
+                        <!-- CATEGORY-MENU-LIST START -->
+                        <div class="ltn__category-menu-wrap ltn__category-dropdown-hide ltn__category-menu-with-header-menu">
+                            <div class="ltn__category-menu-title">
+                                <h2 class="section-bg-1--- ltn__secondary-bg text-color-white">Products</h2>
+                            </div>
+                            <div class="ltn__category-menu-toggle ltn__one-line-active">
+                                <ul>
+                                    <!-- Groudnut -->
+                                    <li class="ltn__category-menu-item ltn__category-menu-drop">
+                                        <a href="shop.html"><img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/groundnut-6212197-5159052.png" alt="Kidney Icon" style="width:24px; height:24px; margin-right: 6px;">Groudnut oil </a>
+                                        <ul class="ltn__category-submenu ltn__category-column-1">
+                                            <li class="ltn__category-submenu-title ltn__category-menu-drop"><a href="#">Sizes</a>
+                                                <ul class="ltn__category-submenu-children">
+                                                    <li><a href="#">1ltr pack</a></li>
+                                                    <li><a href="#">5ltr pack</a></li>
+                                                    <li><a href="#">15ltr pack</a></li>
+                                                    <li><a href="#">15 kg pack</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <!-- Sesame -->
+                                    <li class="ltn__category-menu-item ltn__category-menu-drop">
+                                        <a href="shop.html"><img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/sesame-seed-2759005-2293832.png" alt="Kidney Icon" style="width:24px; height:24px; margin-right: 6px;">Sesame oil </a>
+                                        <ul class="ltn__category-submenu ltn__category-column-1">
+                                            <li class="ltn__category-submenu-title ltn__category-menu-drop"><a href="#">Sizes</a>
+                                                <ul class="ltn__category-submenu-children">
+                                                    <li><a href="#">1ltr pack</a></li>
+                                                    <li><a href="#">5ltr pack</a></li>
+                                                    <li><a href="#">15ltr pack</a></li>
+                                                    <li><a href="#">15 kg pack</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <!-- Coconut -->
+                                    <li class="ltn__category-menu-item ltn__category-menu-drop">
+                                        <a href="shop.html"><img src="https://thumbs.dreamstime.com/b/coconut-icon-cartoon-exotic-beach-palm-nut-isolated-white-background-260447899.jpg" alt="Kidney Icon" style="width:24px; height:24px; margin-right: 6px;">Coconut oil </a>
+                                        <ul class="ltn__category-submenu ltn__category-column-1">
+                                            <li class="ltn__category-submenu-title ltn__category-menu-drop"><a href="#">Sizes</a>
+                                                <ul class="ltn__category-submenu-children">
+                                                    <li><a href="#">1ltr pack</a></li>
+                                                    <li><a href="#">5ltr pack</a></li>
+                                                    <li><a href="#">15ltr pack</a></li>
+                                                    <li><a href="#">15 kg pack</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <!-- Mustard -->
+                                    <li class="ltn__category-menu-item ltn__category-menu-drop">
+                                        <a href="shop.html"><img src="https://png.pngtree.com/png-clipart/20230913/original/pngtree-mustard-seed-clipart-fruit-in-its-bud-and-blackberries-on-top-png-image_11053223.png" alt="Kidney Icon" style="width:24px; height:24px; margin-right: 6px;">Mustard oil </a>
+                                        <ul class="ltn__category-submenu ltn__category-column-1">
+                                            <li class="ltn__category-submenu-title ltn__category-menu-drop"><a href="#">Sizes</a>
+                                                <ul class="ltn__category-submenu-children">
+                                                    <li><a href="#">1ltr pack</a></li>
+                                                    <li><a href="#">5ltr pack</a></li>
+                                                    <li><a href="#">15ltr pack</a></li>
+                                                    <li><a href="#">15 kg pack</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <!-- Paediatric Health -->
+
+                                </ul>
+                                 
+                                
+                            </div>
+                        </div>
+                        <!-- END CATEGORY-MENU-LIST -->
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="col--- header-menu-column justify-content-center---">
+                            <div class="header-menu header-menu-2 text-start">
+                                <nav>
+                                    <div class="ltn__main-menu">
+                                        <ul>
+                                            <li class="menu-icon"><a href="/blog/">Blog</a>
+                                            </li>
+
+                                            <li><a href="/profile/">Account</a></li>
+                                        </ul>
+                                    </div>
+                                </nav>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-2 align-self-center d-none d-xl-block">
+                        <div class="header-contact-info text-end">
+                            <a class="font-weight-6 ltn__primary-color" href="tel:+918156019763"><span class="ltn__secondary-color"><i class="icon-call font-weight-7"></i></span> +91 8156019763</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- header-bottom-area end -->
+    </header>
+    <!-- HEADER AREA END -->
+
+    <!-- Utilize Cart Menu Start -->
+    <div id="ltn__utilize-cart-menu" class="ltn__utilize ltn__utilize-cart-menu">
+        <div class="ltn__utilize-menu-inner ltn__scrollbar">
+            <div class="ltn__utilize-menu-head">
+                <span class="ltn__utilize-menu-title">Cart</span>
+                <button class="ltn__utilize-close">×</button>
+            </div>
+            <div class="mini-cart-product-area ltn__scrollbar" id="ltn-cart-products">
+                <!-- Cart products will be dynamically added here -->
+                {% for item in cart_products %}
+                <div class="mini-cart-item clearfix" data-product-id="{{ item.product.id }}">
+                    <div class="mini-cart-img">
+                        <a href="#"><img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"></a>
+                        <span class="mini-cart-item-delete" data-product-id="{{ item.product.id }}"><i class="icon-cancel"></i></span>
+                    </div>
+                    <div class="mini-cart-info">
+                        <h6><a href="#">{{ item.product.name }}</a></h6>
+                        {% if currency %}
+    <span class="mini-cart-quantity">{{ item.quantity }} x {{ request.session.currency_symbol }}{{ item.product.price }}</span>
+{% else %}
+    <span class="mini-cart-quantity">{{ item.quantity }} x {{ request.session.currency_symbol }}{{ item.product.price }}</span>
+{% endif %}                    </div>
+                </div>
+                {% empty %}
+                <p>Your cart is empty.</p>
+            {% endfor %}
+
+            </div>
+            <div class="mini-cart-footer">
+                <div class="mini-cart-sub-total">
+                    <h5>Subtotal: <span id="cart-subtotal">{{ request.session.currency_symbol }}{{currency_total}}</span></h5>
+                </div>
+                <div class="btn-wrapper">
+                    <a href="/cart" class="theme-btn-1 btn btn-effect-1">View Cart</a>
+                    <a href="/checkout" class="theme-btn-2 btn btn-effect-2">Checkout</a>
+                </div>
+                <p>Free Shipping on All Orders Over $100!</p>
+            </div>
+
+        </div>
+    </div>
+    <!-- Utilize Cart Menu End -->
+
+    <!-- Utilize Mobile Menu Start -->
+    <div id="ltn__utilize-mobile-menu" class="ltn__utilize ltn__utilize-mobile-menu">
+        <div class="ltn__utilize-menu-inner ltn__scrollbar">
+            <div class="ltn__utilize-menu-head">
+                <div class="site-logo">
+                    <a href="/"><img src="{% static 'img/logo.png' %}" alt="Logo"></a>
+                </div>
+                <button class="ltn__utilize-close">×</button>
+            </div>
+            <div class="ltn__utilize-menu-search-form">
+                <form action="#">
+                    <input type="text" placeholder="Search...">
+                    <button><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <div class="ltn__utilize-menu">
+                <ul>
+                    <li><a href="#">Home</a>
+                        <ul class="sub-menu">
+                            <li><a href="index.html">Home Style 01</a></li>
+                            <li><a href="index-2.html">Home Style 02</a></li>
+                            <li><a href="index-3.html">Home Style 03</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">About</a>
+                        <ul class="sub-menu">
+                            <li><a href="about.html">About</a></li>
+                            <li><a href="service.html">Services</a></li>
+                            <li><a href="service-details.html">Service Details</a></li>
+                            <li><a href="portfolio.html">Portfolio</a></li>
+                            <li><a href="portfolio-2.html">Portfolio - 02</a></li>
+                            <li><a href="portfolio-details.html">Portfolio Details</a></li>
+                            <li><a href="team.html">Team</a></li>
+                            <li><a href="team-details.html">Team Details</a></li>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="locations.html">Google Map Locations</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Shop</a>
+                        <ul class="sub-menu">
+                            <li><a href="shop.html">Shop</a></li>
+                            <li><a href="shop-grid.html">Shop Grid</a></li>
+                            <li><a href="shop-left-sidebar.html">Shop Left sidebar</a></li>
+                            <li><a href="shop-right-sidebar.html">Shop right sidebar</a></li>
+                            <li><a href="product-details.html">Shop details </a></li>
+                            <li><a href="cart.html">Cart</a></li>
+                            <li><a href="/wishlist/">Wishlist</a></li>
+                            <li><a href="checkout.html">Checkout</a></li>
+                            <li><a href="order-tracking.html">Order Tracking</a></li>
+                            <li><a href="account.html">My Account</a></li>
+                            <li><a href="login.html">Sign in</a></li>
+                            <li><a href="register.html">Register</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">News</a>
+                        <ul class="sub-menu">
+                            <li><a href="blog.html">News</a></li>
+                            <li><a href="blog-grid.html">News Grid</a></li>
+                            <li><a href="blog-left-sidebar.html">News Left sidebar</a></li>
+                            <li><a href="blog-right-sidebar.html">News Right sidebar</a></li>
+                            <li><a href="blog-details.html">News details</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Pages</a>
+                        <ul class="sub-menu">
+                            <li><a href="about.html">About</a></li>
+                            <li><a href="service.html">Services</a></li>
+                            <li><a href="service-details.html">Service Details</a></li>
+                            <li><a href="portfolio.html">Portfolio</a></li>
+                            <li><a href="portfolio-2.html">Portfolio - 02</a></li>
+                            <li><a href="portfolio-details.html">Portfolio Details</a></li>
+                            <li><a href="team.html">Team</a></li>
+                            <li><a href="team-details.html">Team Details</a></li>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="history.html">History</a></li>
+                            <li><a href="add-listing.html">Add Listing</a></li>
+                            <li><a href="locations.html">Google Map Locations</a></li>
+                            <li><a href="404.html">404</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="coming-soon.html">Coming Soon</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="ltn__utilize-buttons ltn__utilize-buttons-2">
+                <ul>
+                    <li>
+                        <a href="account.html" title="My Account">
+                            <span class="utilize-btn-icon">
+                                <i class="far fa-user"></i>
+                            </span>
+                            My Account
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/wishlist/" title="Wishlist">
+                            <span class="utilize-btn-icon">
+                                <i class="far fa-heart"></i>
+                                <sup>3</sup>
+                            </span>
+                            Wishlist
+                        </a>
+                    </li>
+                    <li>
+                        <a href="cart.html" title="Shoping Cart">
+                            <span class="utilize-btn-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                                <sup>5</sup>
+                            </span>
+                            Shoping Cart
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="ltn__social-media-2">
+                <ul>
+                    <li><a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                    <li><a href="#" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                    <li><a href="#" title="Linkedin"><i class="fab fa-linkedin"></i></a></li>
+                    <li><a href="#" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Utilize Mobile Menu End -->
+     {% block content %}
+
+     {% endblock %}
+
+     
+    <!-- FOOTER AREA START -->
+    <footer class="ltn__footer-area  ">
+      <div class="footer-top-area  section-bg-2 plr--5">
+          <div class="container-fluid">
+              <div class="row">
+                  <div class="col-xl-3 col-md-6 col-sm-6 col-12">
+                      <div class="footer-widget footer-about-widget">
+                          <div class="footer-logo">
+                              <div class="site-logo">
+                              <a href="/"><img src="{% static 'img/logo6.png' %}" alt="Logo" style="width: 100px; height:auto;"></a>
+                              </div>
+                          </div>
+                          <p>We are an established food and edible oil manufacturers based in Surat, Gujarat, India</p>
+                          <div class="footer-address">
+                              <ul>
+                                  <li>
+                                      <div class="footer-address-icon">
+                                          <i class="icon-placeholder"></i>
+                                      </div>
+                                      <div class="footer-address-info">
+                                          <p>Kamrej, Surat, Gujarat</p>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="footer-address-icon">
+                                          <i class="icon-call"></i>
+                                      </div>
+                                      <div class="footer-address-info">
+                                          <p><a href="tel:+91 96249 23657">+91 96249 23657</a></p>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="footer-address-icon">
+                                          <i class="icon-mail"></i>
+                                      </div>
+                                      <div class="footer-address-info">
+                                          <p><a href="mailto:sodamfoods@gmail.com">sodamfoods@gmail.com</a></p>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="ltn__social-media mt-20">
+                              <ul>
+                                  <li><a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                                  <li><a href="#" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                                  <li><a href="#" title="Linkedin"><i class="fab fa-linkedin"></i></a></li>
+                                  <li><a href="#" title="Youtube"><i class="fab fa-youtube"></i></a></li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-xl-2 col-md-6 col-sm-6 col-12">
+                      <div class="footer-widget footer-menu-widget clearfix">
+                          <h4 class="footer-title">Company</h4>
+                          <div class="footer-menu">
+                              <ul>
+
+                                  <li><a href="/blog/">Blog</a></li>
+                                  <li><a href="/search/">All Products</a></li>
+
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-xl-2 col-md-6 col-sm-6 col-12">
+                      <div class="footer-widget footer-menu-widget clearfix">
+                          <h4 class="footer-title">Services</h4>
+                          <div class="footer-menu">
+                              <ul>
+                                  <li><a href="/wishlist/">Wish List</a></li>
+                                  <li><a href="/login/">Login</a></li>
+                                  <li><a href="/profile/">My account</a></li>
+
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-xl-2 col-md-6 col-sm-6 col-12">
+                      <div class="footer-widget footer-menu-widget clearfix">
+                          <h4 class="footer-title">Customer Care</h4>
+                          <div class="footer-menu">
+                              <ul>
+                                  <li><a href="wa.me/919727781711">Contact us</a></li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-xl-3 col-md-6 col-sm-12 col-12">
+                      <div class="footer-widget footer-newsletter-widget">
+                          <h4 class="footer-title">Newsletter</h4>
+                          <p>Subscribe to our weekly Newsletter and receive updates via email.</p>
+                          <div class="footer-newsletter">
+                              <form action="#">
+                                  <input type="email" name="email" placeholder="Email*">
+                                  <div class="btn-wrapper">
+                                      <button class="theme-btn-1 btn" type="submit"><i class="fas fa-location-arrow"></i></button>
+                                  </div>
+                              </form>
+                          </div>
+                          <h5 class="mt-30">We Accept</h5>
+                          <img src="{% static 'img/icons/payment-4.png' %}" alt="Payment Image">
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="ltn__copyright-area ltn__copyright-2 section-bg-7  plr--5">
+          <div class="container-fluid ltn__border-top-2">
+              <div class="row">
+                  <div class="col-md-6 col-12">
+                      <div class="ltn__copyright-design clearfix">
+                          <p>All Rights Reserved @ Company <span class="current-year"></span></p>
+                      </div>
+                  </div>
+                  <div class="col-md-6 col-12 align-self-center">
+                      <div class="ltn__copyright-menu text-end">
+                          <ul>
+                              <li><a href="#">Terms & Conditions</a></li>
+                              <li><a href="#">Claim</a></li>
+                              <li><a href="#">Privacy & Policy</a></li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </footer>
+  <!-- FOOTER AREA END -->
+
+  <!-- MODAL AREA START (Quick View Modal) -->
+
+  <div class="ltn__modal-area ltn__quick-view-modal-area">
+      <div class="modal fade" id="quick_view_modal" tabindex="-1" style="z-index: 10500000000000;">
+          <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                          <!-- <i class="fas fa-times"></i> -->
+                      </button>
+                      <script>
+                        $('#add_to_cart_modal').on('hidden.bs.modal', function () {
+                            location.reload();
+                        });
+                    </script>
+                  </div>
+                  <div class="modal-body">
+                       <div class="ltn__quick-view-modal-inner">
+                           <div class="modal-product-item">
+                              <div class="row">
+                                  <div class="col-lg-6 col-12">
+                                      <div class="modal-product-image">
+                                          <img src="#" alt="Product Image" id="quick-modal-product-image">
+                                      </div>
+                                  </div>
+                                  <div class="col-lg-6 col-12">
+                                      <div class="modal-product-info">
+                                          <div class="product-ratting">
+                                              <ul>
+                                                  <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                  <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                  <li><a href="#"><i class="fas fa-star"></i></a></li>
+                                                  <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
+                                                  <li><a href="#"><i class="far fa-star"></i></a></li>
+                                                  <li class="review-total"> <a href="#"> ( 95 Reviews )</a></li>
+                                              </ul>
+                                          </div>
+                                          <h3><span id="quick-modal-product-name"></span></h3>
+                                          
+                                          <div class="product-price">
+                                <span id="quick-modal-product-price"></span> <!-- Price placeholder -->
+                                              <del>$165.00</del>
+                                          </div>
+                                          <div class="modal-product-meta ltn__product-details-menu-1">
+                                              <ul>
+                                                  <li>
+                                                      <strong>Categories:</strong> 
+                                                      <span>
+                                                          <a href="#">Parts</a>
+                                                          <a href="#">Car</a>
+                                                          <a href="#">Seat</a>
+                                                          <a href="#">Cover</a>
+                                                      </span>
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                          <div class="ltn__product-details-menu-2">
+                                              <ul>
+                                                  <li>
+                                                      <div class="cart-plus-minus">
+                                                          <input type="number" id="quick-modal-quantity" value="01" name="qtybutton" class="cart-plus-minus-box">
+                                                      </div>
+                                                  </li>
+                                                  <li>
+                                                      <a href="#" id="quick-view-add-to-cart-btn" class="theme-btn-1 btn btn-effect-1 add-to-cart-btn" title="Add to Cart" data-bs-toggle="modal" data-bs-target="#add_to_cart_modal">
+                                                          <i class="fas fa-shopping-cart"></i>
+                                                          <span>ADD TO CART</span>
+                                                      </a>
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                          <div class="ltn__product-details-menu-3">
+                                              <ul>
+                                                  <li>
+                                                      <a href="#" class="" title="Wishlist" data-bs-toggle="modal" data-bs-target="#liton_wishlist_modal">
+                                                          <i class="far fa-heart"></i>
+                                                          <span>Add to Wishlist</span>
+                                                      </a>
+                                                  </li>
+                                                  <li>
+                                                      <a href="#" class="" title="Compare" data-bs-toggle="modal" data-bs-target="#quick_view_modal">
+                                                          <i class="fas fa-exchange-alt"></i>
+                                                          <span>Compare</span>
+                                                      </a>
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                          <hr>
+                                          <div class="ltn__social-media">
+                                              <ul>
+                                                  <li>Share:</li>
+                                                  <li><a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                                                  <li><a href="#" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+                                                  <li><a href="#" title="Linkedin"><i class="fab fa-linkedin"></i></a></li>
+                                                  <li><a href="#" title="Instagram"><i class="fab fa-instagram"></i></a></li>
+                                                  
+                                              </ul>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                           </div>
+                       </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  <!-- MODAL AREA END -->
+
+  <!-- MODAL AREA START (Add To Cart Modal) -->
+<!-- MODAL AREA START (Add To Cart Modal) -->
+<div class="ltn__modal-area ltn__add-to-cart-modal-area">
+  <div class="modal fade" id="add_to_cart_modal" tabindex="-1" style="z-index: 10500000000001;">
+      <div class="modal-dialog modal-md" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+                  <script>
+                    $('#add_to_cart_modal').on('hidden.bs.modal', function () {
+                        location.reload();
+                    });
+                </script>
+              </div>
+              <!-- Modal content (similar structure as your static modal) -->
+              <div class="modal-body">
+                  <div class="ltn__quick-view-modal-inner">
+                      <div class="modal-product-item">
+                          <div class="row">
+                              <div class="col-12">
+                                  <div class="modal-product-img">
+                                      <img src="#" alt="Product Image" id="modal-product-image">
+                                  </div>
+                                  <div class="modal-product-info">
+                                      <h5><span id="modal-product-name"></span></h5>
+                                      <p class="added-cart"><i class="fa fa-check-circle"></i> Successfully added to your Cart</p>
+                                      <div class="btn-wrapper"></div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+<!-- MODAL AREA END -->
+  <!-- MODAL AREA END -->
+
+  <!-- MODAL AREA START (Wishlist Modal) -->
+<!-- MODAL AREA START (Wishlist Modal) -->
+<div class="ltn__modal-area ltn__add-to-cart-modal-area">
+  <div class="modal fade" id="liton_wishlist_modal" tabindex="-1" aria-labelledby="litonWishlistModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-md" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <!-- <h5 class="modal-title" id="litonWishlistModalLabel">Wishlist</h5> -->
+                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <div class="modal-product-item">
+                      <div class="row">
+                          <div class="col-12">
+                              <div class="modal-product-img">
+                                  <img id="wishlist-product-image" src="" alt="Product Image">
+                              </div>
+                              <div class="modal-product-info">
+                                  <h5 id="wishlist-product-name"></h5>
+                                  <p id="wishlist-notification-message"></p>
+                                  <div class="btn-wrapper">
+                                      <a href="{% url 'wishlist' %}" class="theme-btn-1 btn btn-effect-1">View Wishlist</a>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+<!-- MODAL AREA END -->
+  <!-- MODAL AREA END -->
+
+</div>
+<!-- Body main wrapper end -->
+
+  <!-- preloader area start -->
+  <div class="preloader d-none" id="preloader">
+      <div class="preloader-inner">
+          <div class="spinner">
+              <div class="dot1"></div>
+              <div class="dot2"></div>
+          </div>
+      </div>
+  </div>
+  <!-- preloader area end -->
+
+
+
+  <script>
+
+  $(document).ready(function() {
+      // Common function to update cart
+      function updateCart(productId, action, quantity = 1) {
+          $.ajax({
+              url: '{% url "update_cart" %}',
+              method: 'POST',
+              data: {
+                  'product_id': productId,
+                  'action': action,
+                  'quantity': quantity,
+                  'csrfmiddlewaretoken': '{{ csrf_token }}'
+              },
+              success: function(response) {
+                  // Update main cart
+                  $('#cart-total-items').text(response.total_items);
+                  $('#cart-products').empty();
+                  response.products.forEach(product => {
+                      $('#cart-products').append(
+                          '<li>' +
+                          '<img src="' + product.image_url + '" alt="' + product.name + '" style="width: 50px; height: 50px;">' +
+                          product.name + ' - $' + product.price +
+                          '</li>'
+                      );
+                  });
+  
+                  // Update utilize cart menu
+                  $('#ltn-cart-products').empty();
+                  response.products.forEach(product => {
+                      $('#ltn-cart-products').append(
+                          '<div class="mini-cart-item clearfix" data-product-id="' + product.id + '">' +
+                          '<div class="mini-cart-img">' +
+                          '<a href="#"><img src="' + product.image_url + '" alt="' + product.name + '"></a>' +
+                          '<span class="mini-cart-item-delete" data-product-id="' + product.id + '"><i class="icon-cancel"></i></span>' +
+                          '</div>' +
+                          '<div class="mini-cart-info">' +
+                          '<h6><a href="#">' + product.name + '</a></h6>' +
+                          '<span class="mini-cart-quantity">' + product.quantity + ' x $' + product.price + '</span>' +
+                          '</div>' +
+                          '<button class="remove-from-cart-btn" data-product-id="' + product.id + '">Remove from Cart</button>' +
+                          '</div>'
+                      );
+                  });
+  
+                  // Update subtotal
+                  let subtotal = parseFloat(response.cart_subtotal);  // Parse as float if necessary
+                  $('#cart-subtotal').text('$' + subtotal.toFixed(2));
+                  // Close the quick view modal
+                  $('#quick_view_modal').modal('hide');
+
+              },
+              error: function(response) {
+                  alert('Error updating cart');
+                  console.log('AJAX error response:', response);  // Debugging
+              }
+          });
+      }
+// Example of a formatPrice function with dynamic currency symbol
+function formatPrice(price) {
+  const numericPrice = Number(price);
+
+  // Format price to two decimal places
+  if (!isNaN(numericPrice)) {
+      return numericPrice.toFixed(2);
+  } else {
+      return 'Price not available'; // Handle if price is not a valid number
+  }
+}
+      // Function to update quick view modal content
+      function updateQuickViewModal(product) {
+          $('#quick-modal-product-image').attr('src', product.image_url);
+          $('#quick-modal-product-name').text(product.name);
+          $('#quick-modal-product-price').text(formatPrice(product.price)); // Set formatted product price
+
+          $('#quick-modal-quantity').val(1); // Reset quantity to 1
+          $('#quick-view-add-to-cart-btn').data('product-id', product.id);
+          $('#quick-view-add-to-cart-btn').data('product-image', product.image_url); // Store product image
+          $('#quick-view-add-to-cart-btn').data('product-name', product.name); // Store product name
+      }
+  
+      // Open quick view modal with product details
+      $('.quick-view-btn').click(function() {
+          const productId = $(this).data('product-id');
+          // Fetch product details via AJAX
+          $.ajax({
+              url: '/product_details/' + productId + '/',
+              method: 'GET',
+              success: function(product) {
+                  updateQuickViewModal(product);
+                  $('#quick_view_modal').modal('show');
+              },
+              error: function(xhr, status, error) {
+                  alert('Error fetching product details');
+                  console.log('AJAX error:', xhr.responseText); // Log the response for debugging
+              }
+          });
+      });
+  
+      // Add to Cart button click handler (main and quick view modal)
+      $('.add-to-cart-btn').click(function(e) {
+          e.preventDefault(); // Prevent default link behavior
+          const productId = $(this).data('product-id');
+          const quantity = $('#quick-modal-quantity').val() || 1; // Default to 1 if quantity is not provided
+          updateCart(productId, 'add', quantity);
+  
+          // Display the correct product image and name in the notification modal
+          const productImage = $(this).data('product-image');
+          const productName = $(this).data('product-name');
+          $('#modal-product-image').attr('src', productImage);
+          $('#modal-product-name').text(productName);
+          $('#add_to_cart_modal').modal('show');
+  
+          // Reset quick view modal data
+          $('#quick-modal-quantity').val(1); // Reset quantity input to 1 
+      });
+      $('.update-cart-btn').click(function(e) {
+          e.preventDefault(); // Prevent default link behavior
+          const productId = $(this).data('product-id');
+          const quantity = $('#quick-modal-quantity').val() || 1; // Default to 1 if quantity is not provided
+          updateCart(productId, 'update', quantity);
+  
+          // Display the correct product image and name in the notification modal
+          const productImage = $(this).data('product-image');
+          const productName = $(this).data('product-name');
+          $('#modal-product-image').attr('src', productImage);
+          $('#modal-product-name').text(productName);
+          $('#add_to_cart_modal').modal('show');
+  
+          // Reset quick view modal data
+          $('#quick-modal-quantity').val(1); // Reset quantity input to 1 
+      });
+  
+      // Remove from Cart button click handler (inside utilize cart menu)
+      $(document).on('click', '.mini-cart-item-delete', function() {
+          const productId = $(this).data('product-id');
+          updateCart(productId, 'remove');
+      });
+  
+      // Remove from Cart button click handler (outside utilize cart menu)
+      $(document).on('click', '.remove-from-cart-btn', function() {
+          const productId = $(this).data('product-id');
+          updateCart(productId, 'remove');
+      });
+  });
+  </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Add event listener to currency select dropdown
+      document.getElementById('currency-select').addEventListener('change', function() {
+          // Submit the form when currency selection changes
+          document.getElementById('currency-form').submit();
+      });
+  });
+  </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const productId = e.currentTarget.getAttribute('data-product-id');
+            const productName = e.currentTarget.getAttribute('data-product-name');
+            const productImage = e.currentTarget.getAttribute('data-product-image');
+            const icon = document.getElementById(`heart-icon-${productId}`);
+
+            if (!icon) {
+                console.error(`Icon element not found for product ID ${productId}`);
+                return;
+            }
+
+            try {
+                const response = await fetch('{% url "toggle_wishlist" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ product_id: productId })
+                });
+
+                if (response.status === 401) {
+                    // Redirect to login if unauthorized
+                    window.location.href = '/accounts/login/?next=/toggle-wishlist/';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+
+                const nameElement = document.getElementById('wishlist-product-name');
+                const imageElement = document.getElementById('wishlist-product-image');
+                const messageElement = document.getElementById('wishlist-notification-message');
+
+                if (!nameElement || !imageElement || !messageElement) {
+                    console.error('Modal elements not found');
+                    return;
+                }
+
+                if (result.added) {
+                    icon.classList.remove('far', 'fa-heart');
+                    icon.classList.add('fas', 'fa-heart');
+                    updateModal(productName, productImage, 'Successfully added to your Wishlist');
+                } else {
+                    icon.classList.remove('fas', 'fa-heart');
+                    icon.classList.add('far', 'fa-heart');
+                    updateModal(productName, productImage, 'Removed from your Wishlist');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    });
+
+    function updateModal(name, image, message) {
+        console.log("Modal update:", name, image, message);  // Debugging line
+        const nameElement = document.getElementById('wishlist-product-name');
+        const imageElement = document.getElementById('wishlist-product-image');
+        const messageElement = document.getElementById('wishlist-notification-message');
+
+        if (!nameElement || !imageElement || !messageElement) {
+            console.error('Modal elements not found');
+            return;
+        }
+
+        nameElement.innerText = name;
+        imageElement.src = image;
+        messageElement.innerText = message;
+
+        const modal = new bootstrap.Modal(document.getElementById('liton_wishlist_modal'));
+        modal.show();
+    }
+});
+
+  </script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function encodeQuery(value) {
+            return encodeURIComponent(value).replace(/%20/g, '+');
+        }
+    
+        function updateLink(link) {
+            let href = link.getAttribute('href');
+            if (href && (href.includes('shop.html') || href.includes('#'))) {
+                const text = link.textContent.trim();
+                if (text) {
+                    const query = encodeQuery(text);
+                    const newHref = `/search/?q=${query}`;
+                    link.setAttribute('href', newHref);
+                }
+            }
+        }
+    
+        function updateLinksInElement(element) {
+            const links = element.querySelectorAll('a');
+            links.forEach(link => {
+                updateLink(link);
+            });
+        }
+    
+        function updateTopLevelLinks() {
+            // Select all top-level <li> items that contain <a> tags
+            const topLevelItems = document.querySelectorAll('.ltn__category-menu-item > a');
+            
+            topLevelItems.forEach(item => {
+                updateLink(item);
+                const submenu = item.nextElementSibling; // Selects the <ul> that is a sibling of <a>
+                if (submenu) {
+                    updateLinksInElement(submenu);
+                }
+            });
+        }
+    
+        function updateAllLinks() {
+            // First, update top-level links
+            updateTopLevelLinks();
+            
+            // Then, update all submenus
+            const allSubmenus = document.querySelectorAll('.ltn__category-submenu');
+            allSubmenus.forEach(submenu => {
+                updateLinksInElement(submenu);
+            });
+        }
+    
+        updateAllLinks();
+    });
+    </script>
+    
+    
+    
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/66b037081601a2195ba0c23f/1i4g5duq5';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    <!--End of Tawk.to Script-->
+
+
+  
+</body>
+</html>
