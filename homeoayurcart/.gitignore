@@ -1,0 +1,5 @@
+microenv/
+db.sqlite/
+migrations/
+__pycache__/
+static/
