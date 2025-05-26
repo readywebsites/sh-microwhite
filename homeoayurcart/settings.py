@@ -226,4 +226,4 @@ LOGGING = {
     },
 }
 
-SITE_ID = 16  # new
+SITE_ID = 1  # new
