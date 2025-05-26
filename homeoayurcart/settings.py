@@ -44,10 +44,12 @@ INSTALLED_APPS = [
     'blog',
     'tinymce',
     'django.contrib.sites', 
+    'django.contrib.sitemaps',
      'allauth.socialaccount',
      'allauth.socialaccount.providers.google',  
      'allauth.socialaccount.providers.facebook',  
-    # 'allauth.socialaccount.providers.linkedin',  
+    # 'allauth.socialaccount.providers.linkedin', 
+     
 
 ]
 
@@ -223,3 +225,5 @@ LOGGING = {
         },
     },
 }
+
+SITE_ID = 16  # new
