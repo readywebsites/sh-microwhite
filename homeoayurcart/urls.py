@@ -91,6 +91,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Admin site customization
-admin.site.site_header = "Sodam Admin"
-admin.site.site_title = "Sodam Admin Portal"
-admin.site.index_title = "Welcome to Sodam Admin Portal"
+admin.site.site_header = "Microwhite Admin"
+admin.site.site_title = "Microwhite Admin Portal"
+admin.site.index_title = "Welcome to Microwhite Admin Portal"
