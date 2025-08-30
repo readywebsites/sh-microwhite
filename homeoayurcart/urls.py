@@ -11,7 +11,8 @@ from ecommerce.views import (
     wishlist_view, cart, order_confirmation, past_orders, order_tracking,
     user_profile, search, get_address_details, checkout
 )
-from blog.views import post, blog, about   # 👈 ADD THIS
+from blog.views import post, blog, about, contact   # 👈 contact import add karo
+
 
 # Define sitemap for static views
 class StaticViewSitemap(Sitemap):
@@ -19,7 +20,7 @@ class StaticViewSitemap(Sitemap):
     changefreq = 'weekly'
 
     def items(self):
-        return ['home', 'blog', 'checkout', 'cart', 'user_profile', 'about']
+        return ['home', 'blog', 'checkout', 'cart', 'user_profile', 'about', 'contact']
 
     def location(self, item):
         return reverse(item)
@@ -35,8 +36,9 @@ urlpatterns = [
     path('blog/', blog, name='blog'),
     path('post/<slug>/', post, name='post'),
 
-    # 👇 About Page
+    # 👇 Static Pages
     path("about/", about, name="about"),
+    path("contact/", contact, name="contact"),
 
     # Ecommerce
     path('checkout/', checkout, name='checkout'),
