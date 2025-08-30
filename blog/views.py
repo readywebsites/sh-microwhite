@@ -2,87 +2,85 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from urllib.parse import urlencode
 
-from .models import Blog_Post,Category,Comment
-from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
-from django.db.models import Count,Q
+from .models import Blog_Post, Category, Comment
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count, Q
 from .forms import CommentForm, ReplyForm
 # Create your views here.
 
-    
+
 def get_category_count():
-  queryset = Blog_Post\
-    .objects\
-    .values('categories__title') \
-    .annotate(Count('categories__title'))
-  return queryset
+    queryset = Blog_Post\
+        .objects\
+        .values('categories__title') \
+        .annotate(Count('categories__title'))
+    return queryset
 
- 
+
 def search(request):
-  category_count = get_category_count()
-  category_list = Category.objects.all()
-  bloglist = Blog_Post.objects.all().order_by('-Timestamp')
-  query = request.GET.get('q')
+    category_count = get_category_count()
+    category_list = Category.objects.all()
+    bloglist = Blog_Post.objects.all().order_by('-Timestamp')
+    query = request.GET.get('q')
 
-  if query:
-    bloglist = bloglist.filter(
-      Q(title__icontains = query) |
-      Q(overview__icontains = query) |
-      Q(meta_description__icontains = query) |       
-      Q(meta_keywords__icontains = query) |      
-      Q(meta_title__icontains = query) |      
-      Q(meta_author__icontains = query)|        
-      Q(categories__title__icontains = query)     
-    ).distinct()
+    if query:
+        bloglist = bloglist.filter(
+            Q(title__icontains=query) |
+            Q(overview__icontains=query) |
+            Q(meta_description__icontains=query) |
+            Q(meta_keywords__icontains=query) |
+            Q(meta_title__icontains=query) |
+            Q(meta_author__icontains=query) |
+            Q(categories__title__icontains=query)
+        ).distinct()
 
-  paginator = Paginator(bloglist,1)
-  page_request_variable = 'page'
-  page = request.GET.get(page_request_variable)
-  try:
-    paginated_queryset = paginator.page(page)
-  except EmptyPage:
-    paginated_queryset = paginator.page(2)
-  except PageNotAnInteger:
-    paginated_queryset = paginator.page(1)
+    paginator = Paginator(bloglist, 1)
+    page_request_variable = 'page'
+    page = request.GET.get(page_request_variable)
+    try:
+        paginated_queryset = paginator.page(page)
+    except EmptyPage:
+        paginated_queryset = paginator.page(2)
+    except PageNotAnInteger:
+        paginated_queryset = paginator.page(1)
 
-  latest = Blog_Post.objects.order_by('-Timestamp')[0:3]
-  context = {   
-    'category_count' : category_count,
-    'bloglist' : paginated_queryset,
-    'page_request_variable' : page_request_variable,
-    'latest':latest,
-    'query':query,
-    'category_list':category_list,
-  }
+    latest = Blog_Post.objects.order_by('-Timestamp')[0:3]
+    context = {
+        'category_count': category_count,
+        'bloglist': paginated_queryset,
+        'page_request_variable': page_request_variable,
+        'latest': latest,
+        'query': query,
+        'category_list': category_list,
+    }
 
-
-  return render(request,'search_result.html',context)
+    return render(request, 'search_result.html', context)
 
 
 def blog(request):
-  category_list = Category.objects.all()
-  category_count = get_category_count()
-  bloglist = Blog_Post.objects.all().order_by('-Timestamp')
-  paginator = Paginator(bloglist,2)
-  page_request_variable = 'page'
-  page = request.GET.get(page_request_variable)
-  try:
-    paginated_queryset = paginator.page(page)
-  except EmptyPage:
-    paginated_queryset = paginator.page(paginator.num_pages)
-  except PageNotAnInteger:
-    paginated_queryset = paginator.page(1)
-  
-  latest = Blog_Post.objects.order_by ('-Timestamp')[0:3]
+    category_list = Category.objects.all()
+    category_count = get_category_count()
+    bloglist = Blog_Post.objects.all().order_by('-Timestamp')
+    paginator = Paginator(bloglist, 2)
+    page_request_variable = 'page'
+    page = request.GET.get(page_request_variable)
+    try:
+        paginated_queryset = paginator.page(page)
+    except EmptyPage:
+        paginated_queryset = paginator.page(paginator.num_pages)
+    except PageNotAnInteger:
+        paginated_queryset = paginator.page(1)
 
+    latest = Blog_Post.objects.order_by('-Timestamp')[0:3]
 
-  context = {
-    'category_list' : category_list,
-    'category_count' : category_count,
-    'bloglist' : paginated_queryset,
-    'page_request_variable' : page_request_variable,
-    'latest':latest,
-  }
-  return render(request,'blog-grid.html',context)
+    context = {
+        'category_list': category_list,
+        'category_count': category_count,
+        'bloglist': paginated_queryset,
+        'page_request_variable': page_request_variable,
+        'latest': latest,
+    }
+    return render(request, 'blog-grid.html', context)
 
 
 def post(request, slug):
@@ -131,3 +129,8 @@ def post(request, slug):
         'reply_form': reply_form,
     }
     return render(request, 'blog-details.html', context)
+
+
+# 🔹 About Us Page
+def about(request):
+    return render(request, "about.html")

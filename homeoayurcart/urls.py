@@ -1,18 +1,3 @@
-"""homeoayurcart URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include, reverse
 from django.conf import settings
@@ -26,7 +11,7 @@ from ecommerce.views import (
     wishlist_view, cart, order_confirmation, past_orders, order_tracking,
     user_profile, search, get_address_details, checkout
 )
-from blog.views import post, blog
+from blog.views import post, blog, about   # 👈 ADD THIS
 
 # Define sitemap for static views
 class StaticViewSitemap(Sitemap):
@@ -34,28 +19,14 @@ class StaticViewSitemap(Sitemap):
     changefreq = 'weekly'
 
     def items(self):
-        # List of named URLs for static pages or important views
-        return ['home', 'blog', 'checkout', 'cart', 'user_profile']
+        return ['home', 'blog', 'checkout', 'cart', 'user_profile', 'about']
 
     def location(self, item):
         return reverse(item)
 
-# Optional: Add a sitemap for blog posts (dynamic content)
-class BlogSitemap(Sitemap):
-    priority = 0.8
-    changefreq = 'daily'
-
-    def items(self):
-        from blog.models import Post  # import your blog post model here
-        return Post.objects.filter(published=True)
-
-    def lastmod(self, obj):
-        return obj.updated_at  # assuming you have updated_at datetime field
 
 sitemaps = {
     'static': StaticViewSitemap,
-    # Uncomment if you want to include blog posts in sitemap
-    # 'blog': BlogSitemap,
 }
 
 urlpatterns = [
@@ -63,6 +34,11 @@ urlpatterns = [
     path('', index, name='home'),
     path('blog/', blog, name='blog'),
     path('post/<slug>/', post, name='post'),
+
+    # 👇 About Page
+    path("about/", about, name="about"),
+
+    # Ecommerce
     path('checkout/', checkout, name='checkout'),
     path('product_details/<int:product_id>/', product_details, name='product_details'),
     path('cart/', cart, name='cart'),
@@ -82,7 +58,7 @@ urlpatterns = [
     path('phone-login/', phone_login, name='phone_login'),
     path('phone-callback/', phone_callback, name='phone_callback'),
 
-    # Sitemap URL
+    # Sitemap
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
 ]
 
