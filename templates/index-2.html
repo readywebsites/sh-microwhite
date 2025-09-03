@@ -8,13 +8,13 @@
     <div class="ltn__utilize-overlay"></div>    
 
     <!-- SLIDER AREA START (slider-3) -->
-    <div class="ltn__slider-area ltn__slider-3---  section-bg-1--- mt-30">
+    <div class="ltn_slider-area ltn_slider-3---  section-bg-1--- mt-30">
         <div class="container">
             <div class="row">
                 <div class="col-lg-7">
                     <div class="ltn__slide-active-2 slick-slide-arrow-1 slick-slide-dots-1 mb-30">
                         <!-- ltn__slide-item -->
-                        <div class="ltn__slide-item ltn__slide-item-10 section-bg-1 bg-image" data-bs-bg="static/img/slider/sh_bg.jpg">
+                        <div class="ltn_slide-item ltn_slide-item-10 section-bg-1 bg-image" data-bs-bg="static/img/slider/sh_bg.jpg">
                             <div class="ltn__slide-item-inner">
                                 <div class="container">
                                     <div class="row">
@@ -43,7 +43,7 @@
                             </div>
                         </div>
                         <!-- ltn__slide-item -->
-                        <div class="ltn__slide-item ltn__slide-item-10 section-bg-1 bg-image" data-bs-bg="static/img/slider/ee.jpg">
+                        <div class="ltn_slide-item ltn_slide-item-10 section-bg-1 bg-image" data-bs-bg="static/img/slider/ee.jpg">
                             <div class="ltn__slide-item-inner">
                                 <div class="container">
                                     <div class="row">
@@ -153,7 +153,7 @@
     <!-- CATEGORY AREA END -->
 
     <!-- PRODUCT AREA START (product-item-3) -->
-    <div class="ltn__product-area ltn__product-gutter  no-product-ratting pt-20--- pt-65  pb-70">
+    <div class="ltn_product-area ltn_product-gutter  no-product-ratting pt-20--- pt-65  pb-70">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -186,9 +186,9 @@
                         {% for product in products|slice:"0:9"  %}
                         <!-- ltn__product-item -->
                         <div class="col-lg-3--- col-md-4 col-sm-6 col-6">
-                            <div class="ltn__product-item ltn__product-item-2 text-left">
+                            <div class="ltn_product-item ltn_product-item-2 text-left">
                                 <div class="product-img">
-                                    <a href="product-details.html"><img src="{{ product.image.url }}" alt="{{ product.name }}"></a>
+                                    <a href="{{ product.get_absolute_url }}"><img src="{{ product.image.url }}" alt="{{ product.name }}"></a>
                                     <div class="product-badge">
                                         <ul>
                                             <li class="sale-badge">New</li>
@@ -224,8 +224,7 @@
                                             <li><a href="#"><i class="far fa-star"></i></a></li>
                                         </ul>
                                     </div>
-                                    <h2 class="product-title"><a href="product-details.html">{{ product.name }}</a></h2>
-                                    <div class="product-price">
+                                    <h2 class="product-title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
                                         <span>₹{{ request.session.currency_symbol }} {{ product.price }}</span>
                                         <del>₹ {{ product.price|add_amount:200  }}</del>
                                     </div>
@@ -253,7 +252,7 @@
                             <h1 class="section-title">Buy 1 Liter <br> Get 500ml Free</h1>
                             <p>Taste the Purity of Our Premium Edible Oil!</p>
                         </div>
-                        <div class="ltn__countdown ltn__countdown-3 bg-white--" data-countdown="2023/10/28"><div class="single"><h1>00</h1><p>Days</p></div> <div class="single"><h1>00</h1><p>Hrs</p></div> <div class="single"><h1>00</h1><p>Mins</p></div> <div class="single"><h1>00</h1><p>Secs</p></div></div>
+                        <div class="ltn_countdown ltn_countdown-3 bg-white--" data-countdown="2023/10/28"><div class="single"><h1>00</h1><p>Days</p></div> <div class="single"><h1>00</h1><p>Hrs</p></div> <div class="single"><h1>00</h1><p>Mins</p></div> <div class="single"><h1>00</h1><p>Secs</p></div></div>
                         <div class="btn-wrapper animated">
                             <a href="contact.html" class="theme-btn-1 btn btn-effect-1 text-uppercase">Book Now</a>
                             <a href="shop.html" class="ltn__secondary-color text-decoration-underline">Today's Holistic Special</a>
@@ -271,7 +270,7 @@
 
 
     <!-- PRODUCT AREA START (product-item-3) -->
-    <div class="ltn__product-area ltn__product-gutter  no-product-ratting pt-115 pb-70---">
+    <div class="ltn_product-area ltn_product-gutter  no-product-ratting pt-115 pb-70---">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -284,7 +283,7 @@
             {% for product in products|slice:"9:14"  %}
                 <!-- ltn__product-item -->
                 <div class="col-lg-3 col-md-4 col-sm-6 col-6">
-                    <div class="ltn__product-item ltn__product-item-3 text-center">
+                    <div class="ltn_product-item ltn_product-item-3 text-center">
                         <div class="product-img">
                             <a href="product-details.html"><img src="{{product.image.url}}" alt="#"></a>
                             <div class="product-hover-action">
@@ -408,7 +407,7 @@
     <!-- SMALL PRODUCT LIST AREA END -->
 
     <!-- PRODUCT AREA START (product-item-3) -->
-    <div class="ltn__product-area ltn__product-gutter pt-115 pb-70">
+    <div class="ltn_product-area ltn_product-gutter pt-115 pb-70">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -421,7 +420,7 @@
             {% for product in products|slice:"23:32"  %}
                 <!-- ltn__product-item -->
                 <div class="col-lg-3 col-md-4 col-sm-6 col-6">
-                    <div class="ltn__product-item ltn__product-item-3 text-left">
+                    <div class="ltn_product-item ltn_product-item-3 text-left">
                         <div class="product-img">
                             <a href="product-details.html"><img src="{{ product.image.url }}" alt="#"></a>
                             <div class="product-badge">
@@ -529,11 +528,11 @@
                     </div>
                 </div>
             </div>
-            <div class="row  ltn__blog-slider-one-active slick-arrow-1 ltn__blog-item-3-normal">
+            <div class="row  ltn_blog-slider-one-active slick-arrow-1 ltn_blog-item-3-normal">
                 {% for blog in bloglist %}
                 <!-- Blog Item -->
                 <div class="col-lg-12">
-                    <div class="ltn__blog-item ltn__blog-item-3">
+                    <div class="ltn_blog-item ltn_blog-item-3">
                         <div class="ltn__blog-img">
                             <a href="blog-details.html"><img src="{{blog.thumbnail_800_563.url}}" alt="#"></a>
                         </div>
@@ -576,8 +575,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="ltn__feature-item-box-wrap ltn__feature-item-box-wrap-2 ltn__border--- section-bg-1">
-                        <div class="ltn__feature-item ltn__feature-item-8">
+                    <div class="ltn_feature-item-box-wrap ltnfeature-item-box-wrap-2 ltn_border--- section-bg-1">
+                        <div class="ltn_feature-item ltn_feature-item-8">
                             <div class="ltn__feature-icon">
                                 <img src="{% static 'img/icons/svg/8-trolley.svg' %}" alt="#">
                             </div>
@@ -586,7 +585,7 @@
                                 <p>On all orders over ₹49.00</p>
                             </div>
                         </div>
-                        <div class="ltn__feature-item ltn__feature-item-8">
+                        <div class="ltn_feature-item ltn_feature-item-8">
                             <div class="ltn__feature-icon">
                                 <img src="{% static 'img/icons/svg/9-money.svg' %}" alt="#">
                             </div>
@@ -595,7 +594,7 @@
                                 <p>Moneyback guarantee</p>
                             </div>
                         </div>
-                        <div class="ltn__feature-item ltn__feature-item-8">
+                        <div class="ltn_feature-item ltn_feature-item-8">
                             <div class="ltn__feature-icon">
                                 <img src="{% static 'img/icons/svg/10-credit-card.svg' %}" alt="#">
                             </div>
@@ -604,7 +603,7 @@
                                 <p>Protected by Paypal</p>
                             </div>
                         </div>
-                        <div class="ltn__feature-item ltn__feature-item-8">
+                        <div class="ltn_feature-item ltn_feature-item-8">
                             <div class="ltn__feature-icon">
                                 <img src="{% static 'img/icons/svg/11-gift-card.svg' %}" alt="#">
                             </div>
