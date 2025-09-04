@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from .forms import OrderForm,AddressForm,UserProfileForm, UserForm
 from django.db.models import Q
 from blog.models import Blog_Post
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
 @require_POST
@@ -577,7 +577,7 @@ def shop(request):
     # Filtering
     category_id = request.GET.get('category')
     if category_id:
-        products = products.filter(category_id=category_id)
+        products = products.filter(category__id=category_id)
     
     # Sorting
     sort_by = request.GET.get('sort_by')
@@ -593,7 +593,14 @@ def shop(request):
     # Pagination
     paginator = Paginator(products, 12)  # Show 12 products per page
     page_number = request.GET.get('page')
-    products = paginator.get_page(page_number)
+    try:
+        products = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        products = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        products = paginator.page(paginator.num_pages)
 
     context = {
         'products': products,
