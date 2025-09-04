@@ -24,7 +24,14 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <!-- Responsive css -->
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
-     <!-- Include Django CSRF Token -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- All JS Plugins -->
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <!-- Main JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Include Django CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token }}">
 
 </head>
@@ -471,6 +478,9 @@
     <!-- Utilize Mobile Menu End -->
      {% block content %}
 
+     {% endblock %}
+
+     {% block scripts %}
      {% endblock %}
 
      
@@ -1124,10 +1134,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{% static 'assets/js/jspdf.min.js' %}"></script>
-    <script src="{% static 'assets/js/html2canvas.min.js' %}"></script>
-    <script src="{% static 'js/plugins.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
-</body>
+    </body>
 </html>
