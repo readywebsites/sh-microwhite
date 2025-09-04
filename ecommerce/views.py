@@ -208,7 +208,7 @@ def product_details(request, product_id):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse(product_data)
     else:
-        return render(request, 'product_details.html', {'product': product, 'product_data': product_data, 'cart_items': cart_items, 'currencies': currencies,'selected_currency': selected_currency,'product_price': product_price})
+        return render(request, 'product-details.html', {'product': product, 'product_data': product_data, 'cart_items': cart_items, 'currencies': currencies,'selected_currency': selected_currency,'product_price': product_price})
     
 
 @require_POST
