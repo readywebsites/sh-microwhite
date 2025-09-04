@@ -189,6 +189,8 @@ def index(request):
 def product_details(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart = get_cart(request)
+    cart_products = cart.cartproduct_set.all()
+    total = cart.get_total_price()
     currencies = Currency.objects.all()  # Get all available currencies
     selected_currency = request.session.get('currency', 'USD')  # Default to USD if not set in session
 
@@ -208,7 +210,17 @@ def product_details(request, product_id):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse(product_data)
     else:
-        return render(request, 'product-details.html', {'product': product, 'product_data': product_data, 'cart_items': cart_items, 'currencies': currencies,'selected_currency': selected_currency,'product_price': product_price})
+        context = {
+            'product': product,
+            'product_data': product_data,
+            'cart_items': cart_items,
+            'currencies': currencies,
+            'selected_currency': selected_currency,
+            'product_price': product_price,
+            'cart_products': cart_products,
+            'total': total,
+        }
+        return render(request, 'product-details.html', context)
     
 
 @require_POST

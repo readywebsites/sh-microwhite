@@ -922,7 +922,14 @@ function formatPrice(price) {
       $('.add-to-cart-btn').click(function(e) {
           e.preventDefault(); // Prevent default link behavior
           const productId = $(this).data('product-id');
-          const quantity = $('#quick-modal-quantity').val() || 1; // Default to 1 if quantity is not provided
+          let quantity = 1;
+
+          if ($(this).closest('#quick_view_modal').length) {
+              quantity = $('#quick-modal-quantity').val();
+          } else {
+              quantity = $('.cart-plus-minus-box').val();
+          }
+
           updateCart(productId, 'add', quantity);
   
           // Display the correct product image and name in the notification modal
