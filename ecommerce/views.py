@@ -197,6 +197,12 @@ def product_details(request, product_id):
     product_price = product.get_price(selected_currency)
     cart_items = cart.count_unique_items()
 
+    # Top rated products (using price as a proxy for rating)
+    top_rated_products = Product.objects.order_by('-price')[:3]
+
+    # Related products (random products, excluding the current one)
+    related_products = Product.objects.exclude(id=product_id).order_by('?')[:3]
+
     product_data = {
         'id': product.id,
         'name': product.name,
@@ -219,6 +225,8 @@ def product_details(request, product_id):
             'product_price': product_price,
             'cart_products': cart_products,
             'total': total,
+            'top_rated_products': top_rated_products,
+            'related_products': related_products,
         }
         return render(request, 'product-details.html', context)
     
