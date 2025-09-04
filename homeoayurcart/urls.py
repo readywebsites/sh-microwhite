@@ -9,7 +9,7 @@ from ecommerce.views import (
     CustomLoginView, phone_login, phone_callback, apply_coupon, index,
     product_details, update_cart, change_currency, toggle_wishlist,
     wishlist_view, cart, order_confirmation, past_orders, order_tracking,
-    user_profile, search, get_address_details, checkout, shop
+    user_profile, search, get_address_details, checkout
 )
 from blog.views import post, blog, about, contact   # 👈 contact import add karo
 
@@ -59,7 +59,6 @@ urlpatterns = [
     path('apply_coupon/', apply_coupon, name='apply_coupon'),
     path('phone-login/', phone_login, name='phone_login'),
     path('phone-callback/', phone_callback, name='phone_callback'),
-    
 
     # Sitemap
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),

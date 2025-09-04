@@ -213,7 +213,7 @@
                                 <ul>
                                     <!-- Groudnut -->
                                     <li class="ltn__category-menu-item ltn__category-menu-drop">
-                                        <a href="shop.html "><img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/kid-6273644-5224533.png" alt="Kids" style="width:24px; height:24px; margin-right: 6px;">Kids Collection</a>
+                                        <a href="/shop"><img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/kid-6273644-5224533.png" alt="Kids" style="width:24px; height:24px; margin-right: 6px;">Kids Collection</a>
                                         <ul class="ltn__category-submenu ltn__category-column-1">
                                             <li class="ltn__category-submenu-title ltn__category-menu-drop"><a href="#">Age Group</a>
                                                 <ul class="ltn__category-submenu-children">
@@ -227,7 +227,7 @@
                                     </li>
                                     <!-- Sesame -->
                                     <li class="ltn__category-menu-item ltn__category-menu-drop">
-                                        <a href="shop.html "><img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/men-icon-download-in-svg-png-gif-file-formats--glasses-blinder-avatar-gentleman-celebrity-pack-people-icons-1841394.png" alt="Kidney Icon" style="width:24px; height:24px; margin-right: 6px;">Men's Collections </a>
+                                        <a href="/shop"><img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/men-icon-download-in-svg-png-gif-file-formats--glasses-blinder-avatar-gentleman-celebrity-pack-people-icons-1841394.png" alt="Kidney Icon" style="width:24px; height:24px; margin-right: 6px;">Men's Collections </a>
                                         <ul class="ltn__category-submenu ltn__category-column-1">
                                             <li class="ltn__category-submenu-title ltn__category-menu-drop"><a href="#">Sizes</a>
                                                 <ul class="ltn__category-submenu-children">
@@ -241,7 +241,7 @@
                                     </li>
                                     <!-- Coconut -->
                                     <li class="ltn__category-menu-item ltn__category-menu-drop">
-                                        <a href="shop.html "><img src="https://cdn.iconscout.com/icon/free/png-512/free-women-icon-download-in-svg-png-gif-file-formats--people-female-avatar-girl-person-womens-day-pack-icons-4123298.png" alt="Women" style="width:24px; height:24px; margin-right: 6px;">Women's Collection </a>
+                                        <a href="/shop"><img src="https://cdn.iconscout.com/icon/free/png-512/free-women-icon-download-in-svg-png-gif-file-formats--people-female-avatar-girl-person-womens-day-pack-icons-4123298.png" alt="Women" style="width:24px; height:24px; margin-right: 6px;">Women's Collection </a>
                                         <ul class="ltn__category-submenu ltn__category-column-1">
                                             <li class="ltn__category-submenu-title ltn__category-menu-drop"><a href="#">Sizes</a>
                                                 <ul class="ltn__category-submenu-children">
@@ -255,7 +255,7 @@
                                     </li>
                                     <!-- Mustard -->
                                     <li class="ltn__category-menu-item ltn__category-menu-drop">
-                                        <a href="shop.html "><img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/sunglasses-10575856-9243559.png" alt="accesories" style="width:24px; height:24px; margin-right: 6px;">Mustard oil </a>
+                                        <a href="/shop"><img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/sunglasses-10575856-9243559.png" alt="accesories" style="width:24px; height:24px; margin-right: 6px;">Mustard oil </a>
                                         <ul class="ltn__category-submenu ltn__category-column-1">
                                             <li class="ltn__category-submenu-title ltn__category-menu-drop"><a href="#">Sizes</a>
                                                 <ul class="ltn__category-submenu-children">
@@ -390,7 +390,7 @@
                     </li>
                     <li><a href="#">Shop</a>
                         <ul class="sub-menu">
-                            <li><a href="shop.html ">Shop</a></li>
+                            <li><a href="/shop">Shop</a></li>
                             <li><a href="shop-grid.html">Shop Grid</a></li>
                             <li><a href="shop-left-sidebar.html">Shop Left sidebar</a></li>
                             <li><a href="shop-right-sidebar.html">Shop right sidebar</a></li>
@@ -1068,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         function updateLink(link) {
             let href = link.getAttribute('href');
-            if (href && (href.includes('shop.html ') || href.includes('#'))) {
+            if (href && (href.includes('/shop') || href.includes('#'))) {
                 const text = link.textContent.trim();
                 if (text) {
                     const query = encodeQuery(text);
