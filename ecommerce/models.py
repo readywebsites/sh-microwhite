@@ -13,7 +13,7 @@ class Coupon(models.Model):
     end_date = models.DateTimeField()  # End date for coupon validity
     is_active = models.BooleanField(default=True)  # Is the coupon currently active
 
-    def _str_(self):
+    def __str__(self):
         return self.code
 
     def is_valid(self):
@@ -41,7 +41,7 @@ class Currency(models.Model):
     conversion_rate = models.DecimalField(max_digits=10, decimal_places=2)
     symbol = models.CharField(max_length=5)
 
-    def _str_(self):
+    def __str__(self):
         return self.code
     
 
@@ -52,7 +52,7 @@ class UserProfile(models.Model):
     address = models.TextField(blank=True, null=True)
     additional_addresses = models.TextField(blank=True, null=True)  # Can store multiple addresses in JSON format
 
-    def _str_(self):
+    def __str__(self):
         return self.user.username
 
     def add_address(self, address):
@@ -88,7 +88,7 @@ class Product(models.Model):
     stock = models.BooleanField(default=True)
     image = models.ImageField(upload_to='products/')
 
-    def _str_(self):
+    def __str__(self):
         return self.name
     
     def get_price(self, currency):
@@ -112,7 +112,7 @@ class Cart(models.Model):
     session_id = models.CharField(max_length=40, null=True, blank=True)
     products = models.ManyToManyField(Product, through='CartProduct')
 
-    def _str_(self):
+    def __str__(self):
         if self.user:
             return f"Cart of {self.user.username}"
         return f"Cart with session {self.session_id}"
@@ -131,7 +131,7 @@ class CartProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.quantity} of {self.product.name} in {self.cart}"
     
 
@@ -157,7 +157,7 @@ class Address(models.Model):
     zipcode = models.CharField(max_length=20)
     phone = models.CharField(max_length=20)  # New field for phone number
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.first_name} {self.last_name} - {self.address_line_1},{self.country},{self.state},{self.city},{self.zipcode},{self.phone}"
 
 
@@ -177,7 +177,7 @@ class Order(models.Model):
         ('failed', 'Failed'),
     ], default='unpaid')
 
-    def _str_(self):
+    def __str__(self):
         return f"Order #{self.pk} by {self.user.username}"
 
     def get_total_price(self):
@@ -196,5 +196,5 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.quantity} of {self.product.name} in order {self.order.id}"
