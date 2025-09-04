@@ -59,7 +59,7 @@ urlpatterns = [
     path('apply_coupon/', apply_coupon, name='apply_coupon'),
     path('phone-login/', phone_login, name='phone_login'),
     path('phone-callback/', phone_callback, name='phone_callback'),
-    path('shop/', shop, name='shop'),
+    
 
     # Sitemap
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
