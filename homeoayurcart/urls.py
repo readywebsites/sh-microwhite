@@ -11,7 +11,8 @@ from ecommerce.views import (
     wishlist_view, cart, order_confirmation, past_orders, order_tracking,
     user_profile, search, get_address_details, checkout
 )
-from blog.views import post, blog, about, contact, shop  # 👈 contact import add karo
+from blog.views import post, blog, about, contact
+from ecommerce.views import shop  # 👈 contact import add karo
 
 
 # Define sitemap for static views

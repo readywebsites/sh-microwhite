@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render,get_object_or_404
-from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon
+from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon, Category
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 import json
@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from .forms import OrderForm,AddressForm,UserProfileForm, UserForm
 from django.db.models import Q
 from blog.models import Blog_Post
+from django.core.paginator import Paginator
 
 # Create your views here.
 @require_POST
@@ -142,7 +143,6 @@ def update_cart(request):
             return JsonResponse({'error': f'An error occurred: {e}'}, status=500)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
-
 
 
 def index(request):
@@ -569,3 +569,34 @@ def create_or_update_user_profile(user, phone_number):
         # Update existing user profile
         user_profile.phone_number = phone_number
         user_profile.save()
+
+def shop(request):
+    products = Product.objects.all()
+    categories = Category.objects.all()
+
+    # Filtering
+    category_id = request.GET.get('category')
+    if category_id:
+        products = products.filter(category_id=category_id)
+    
+    # Sorting
+    sort_by = request.GET.get('sort_by')
+    if sort_by == 'popularity':
+        products = products.order_by('-id')  # Assuming popularity is related to views or sales
+    elif sort_by == 'new_arrivals':
+        products = products.order_by('-created_at')
+    elif sort_by == 'price_low_to_high':
+        products = products.order_by('price')
+    elif sort_by == 'price_high_to_low':
+        products = products.order_by('-price')
+
+    # Pagination
+    paginator = Paginator(products, 12)  # Show 12 products per page
+    page_number = request.GET.get('page')
+    products = paginator.get_page(page_number)
+
+    context = {
+        'products': products,
+        'categories': categories,
+    }
+    return render(request, 'shop.html', context)
