@@ -7,6 +7,12 @@ from django.views.decorators.http import require_POST
 from .forms import OrderForm,AddressForm,UserProfileForm, UserForm
 from django.db.models import Q
 from blog.models import Blog_Post
+import logging
+import requests
+from django.contrib.auth import login
+from django.contrib.auth.models import User
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 @require_POST
@@ -463,7 +469,6 @@ class CustomLoginView(LoginView):
         context['auth_url'] = AUTH_URL
         return context
 
-
 def phone_login(request):
     CLIENT_ID = "13173857965042182049"  # Replace with your actual CLIENT_ID
     REDIRECT_URL = request.build_absolute_uri('/phone-callback/')  # Adjust path as needed
@@ -473,17 +478,16 @@ def phone_login(request):
         'auth_url': AUTH_URL
     }
     return render(request, 'phone_login.html', context)
-from django.contrib.auth.models import User
-from .models import UserProfile  # Import your UserProfile model
 
-logger = logging.getLogger(__name__)
+
 def phone_callback(request):
-    user_json_url = request.GET.get('user_json_url', None)
+    user_json_url = request.GET.get('user_json_url')
     if not user_json_url:
         return JsonResponse({'error': 'User JSON URL is missing'}, status=400)
 
     try:
-        response = requests.get(user_json_url)
+        # Fetch user details from Phone.Email
+        response = requests.get(user_json_url, timeout=10)
         response.raise_for_status()
         response_data = response.json()
 
@@ -499,32 +503,36 @@ def phone_callback(request):
 
         # Check if the user exists
         user = User.objects.filter(username=complete_phone_number).first()
-        if user is None:
+        if not user:
             # Create user if not exists
-            user = User.objects.create_user(username=complete_phone_number, password='defaultpassword')
-            user.backend = 'ecommerce.auth_backends.CustomBackend'  # Set the backend attribute
+            user = User.objects.create_user(
+                username=complete_phone_number,
+                password=User.objects.make_random_password()
+            )
 
-        # Set user details
-        user.first_name = first_name
-        user.last_name = last_name
+        # Update user details
+        user.first_name = first_name or user.first_name
+        user.last_name = last_name or user.last_name
         user.save()
 
-        # Update or create the user profile
-        create_or_update_user_profile(user, complete_phone_number)
+        # Update or create user profile
+        UserProfile.objects.update_or_create(
+            user=user,
+            defaults={'phone_number': complete_phone_number}
+        )
 
         # Log the user in
-        login(request, user)
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
         return redirect('/')
 
-
     except requests.RequestException as e:
-        logger.error(f'Request error: {str(e)}')
+        logger.error(f'Request error from Phone.Email: {str(e)}')
         return JsonResponse({'error': 'Failed to fetch user details'}, status=500)
     except Exception as e:
-        logger.error(f'Unexpected error: {str(e)}')
+        logger.error(f'Unexpected error in phone_callback: {str(e)}')
         return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
-    
+
 from django.contrib.auth import authenticate
 
 # def authenticate_phone(phone_number):
