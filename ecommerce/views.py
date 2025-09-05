@@ -495,8 +495,10 @@ def phone_login(request):
     return render(request, 'phone_login.html', context)
 from django.contrib.auth.models import User
 from .models import UserProfile  # Import your UserProfile model
+from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
+@csrf_exempt
 def phone_callback(request):
     user_json_url = request.GET.get('user_json_url', None)
     if not user_json_url:
@@ -530,7 +532,7 @@ def phone_callback(request):
         user.save()
 
         # Update or create the user profile
-        create_or_update_user_profile(user, complete_phone_number)
+        create_or_update_user_profile(user, complete_phone_number, first_name, last_name)
 
         # Log the user in
         login(request, user)
@@ -560,14 +562,21 @@ def authenticate_phone(phone_number):
     print(f"Using backend: {backend}")
     return user
 
-def create_or_update_user_profile(user, phone_number):
+def create_or_update_user_profile(user, phone_number, first_name='', last_name=''):
+    # Combine first and last name for the profile's display name if available
+    full_name = f"{first_name} {last_name}".strip() if first_name or last_name else None
     user_profile, created = UserProfile.objects.get_or_create(
         user=user,
-        defaults={'phone_number': phone_number}
+        defaults={
+            'phone_number': phone_number,
+            'name': full_name
+        }
     )
     if not created:
-        # Update existing user profile
+        # Update the existing user profile if new values are provided
         user_profile.phone_number = phone_number
+        if full_name:
+            user_profile.name = full_name
         user_profile.save()
 
 def shop(request):
