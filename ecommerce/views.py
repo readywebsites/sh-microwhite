@@ -482,6 +482,11 @@ class CustomLoginView(LoginView):
         AUTH_URL = f"https://www.phone.email/auth/log-in?client_id={CLIENT_ID}&redirect_url={REDIRECT_URL}"
         context['auth_url'] = AUTH_URL
         return context
+    
+    def render_to_response(self, context, **response_kwargs):
+        response = super().render_to_response(context, **response_kwargs)
+        response['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
+        return response
 
 
 def phone_login(request):
@@ -492,7 +497,9 @@ def phone_login(request):
     context = {
         'auth_url': AUTH_URL
     }
-    return render(request, 'phone_login.html', context)
+    response =  render(request, 'phone_login.html', context)
+    response['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
+    return response
 from django.contrib.auth.models import User
 from .models import UserProfile  # Import your UserProfile model
 from django.views.decorators.csrf import csrf_exempt
