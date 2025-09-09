@@ -473,8 +473,9 @@ import requests
 
 import logging
 
-from allauth.account.views import LoginView
-class CustomLoginView(LoginView):
+from django.views import View
+
+class CustomLoginView(View):
     def get(self, request, *args, **kwargs):
         CLIENT_ID = "13173857965042182049"  # Replace with your actual CLIENT_ID
         REDIRECT_URL = request.build_absolute_uri('/phone-callback/')  # Adjust path as needed
@@ -484,7 +485,7 @@ class CustomLoginView(LoginView):
             'auth_url': AUTH_URL
         }
 
-        response = render(request, 'login_page_template.html', context)  # Replace 'login_page_template.html' with your actual template
+        response = render(request, 'account/login.html', context)
         response['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
         return response
 

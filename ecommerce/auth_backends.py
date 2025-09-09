@@ -1,21 +1,14 @@
-# myapp/auth_backends.py
-
-from django.contrib.auth.backends import BaseBackend
+from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
-# from django.core.exceptions import ObjectDoesNotExist
 
-class CustomBackend(BaseBackend):
+class CustomBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
-        # Authenticate the user based on the backend logic
-        if username:
-            try:
-                user = User.objects.get(username=username)
-                if user.check_password(password):
-                    # Set the backend attribute on the user
-                    user.backend = 'ecommerce.auth_backends.CustomBackend'
-                    return user
-            except User.DoesNotExist:
-                return None
+        try:
+            user = User.objects.get(username=username)
+            # The password is not checked because the user is already authenticated by phone.email
+            return user
+        except User.DoesNotExist:
+            return None
 
     def get_user(self, user_id):
         try:
