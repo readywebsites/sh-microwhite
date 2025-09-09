@@ -128,16 +128,10 @@
 
 
 <script>
-    function phoneEmailListener(userObj) {
-        var user_json_url = userObj.user_json_url;
-        var popup = window.open('/phone-login-popup/', 'phone_login_popup', 'width=400,height=600');
-    }
-
-    window.addEventListener('message', function(event) {
-        if (event.data.user_json_url) {
-            location.href = '/phone-callback/?user_json_url=' + event.data.user_json_url;
-        }
-    });
+function phoneEmailListener(userObj){
+    var user_json_url = userObj.user_json_url;
+    location.href = '/phone-callback/?user_json_url='+user_json_url+''
+}
 </script>
 
 {% endblock %}
