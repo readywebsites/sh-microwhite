@@ -20,20 +20,7 @@ class AddressForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['phone_number', 'address', 'additional_addresses']
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['additional_addresses'].widget = forms.Textarea(attrs={'rows': 3})
-
-    def clean_additional_addresses(self):
-        data = self.cleaned_data['additional_addresses']
-        try:
-            addresses = json.loads(data)
-            if not isinstance(addresses, list):
-                raise forms.ValidationError("Invalid data format. Should be a list of addresses.")
-        except json.JSONDecodeError:
-            raise forms.ValidationError("Invalid JSON format.")
-        return data
+        fields = ['phone_number', 'address']
     
 class UserForm(forms.ModelForm):
     class Meta:
