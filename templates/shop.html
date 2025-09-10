@@ -104,7 +104,7 @@
                                                 </div>
                                                 <h2 class="product-title"><a href="{% url 'product_details' product.id %}">{{ product.name }}</a></h2>
                                                 <div class="product-price">
-                                                    <span>${{ product.price }}</span>
+                                                    <span>₹{{ product.price }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -136,7 +136,7 @@
                                                     </ul>
                                                 </div>
                                                 <div class="product-price">
-                                                    <span>${{ product.price }}</span>
+                                                    <span>₹{{ product.price }}</span>
                                                 </div>
                                                 <div class="product-brief">
                                                     <p>{{ product.description }}</p>
@@ -212,6 +212,13 @@
                                         <input type="submit" value="Filter"/> 
                                     </div>
                                 </form>
+                                <div class="short-by text-center">
+                                    <select class="nice-select" onchange="location = this.value;">
+                                        <option>Sort by price</option>
+                                        <option value="?sort_by=price_low_to_high">Low to high</option>
+                                        <option value="?sort_by=price_high_to_low">High to low</option>
+                                    </select>
+                                </div> 
                             </div>
                         </div>
                         <!-- Tagcloud Widget -->

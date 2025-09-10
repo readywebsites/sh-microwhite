@@ -640,6 +640,10 @@ def shop(request):
         products = products.order_by('price')
     elif sort_by == 'price_high_to_low':
         products = products.order_by('-price')
+    elif sort_by == 'price':
+        products = products.order_by('price')
+    elif sort_by == '-price':
+        products = products.order_by('-price')
 
     # Pagination
     paginator = Paginator(products, 12)  # Show 12 products per page
