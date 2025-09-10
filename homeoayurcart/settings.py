@@ -203,7 +203,7 @@ ACCOUNT_USERNAME_REQUIRED = False  # Username is not required
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # Email verification is optional
 
 # This is crucial to allow login by email or username
-ACCOUNT_AUTHENTICATION_METHOD = 'username'  # Set the default authentication method
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Set the default authentication method
 
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
