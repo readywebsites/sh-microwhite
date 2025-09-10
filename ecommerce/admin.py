@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Order, Address, ProductImage, Currency
+from .models import Product, Order, Address, ProductImage, Currency, UserProfile
 
 
 class ProductImageInline(admin.TabularInline):
