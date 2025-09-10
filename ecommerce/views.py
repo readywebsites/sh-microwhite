@@ -597,7 +597,7 @@ def privacy_policy(request):
 
 def shop(request):
     products = Product.objects.all()
-    categories = Category.objects.all()
+    categories = ['Men', 'Women', 'Kids', 'Accessories']
 
     # Extract unique tags, sizes, and colors from product titles
     all_tags = sorted(list(set(tag for product in products for tag in product.name.split() if not tag.isdigit())))
@@ -606,9 +606,9 @@ def shop(request):
 
 
     # Filtering
-    category_id = request.GET.get('category')
-    if category_id:
-        products = products.filter(category__id=category_id)
+    category = request.GET.get('category')
+    if category:
+        products = products.filter(name__icontains=category)
 
     min_price = request.GET.get('min_price')
     if min_price:
