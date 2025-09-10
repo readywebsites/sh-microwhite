@@ -226,7 +226,7 @@
                                     </div>
                                     <h2 class="product-title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
                                     <div class="product-price">
-                                        <span>₹{{ request.session.currency_symbol }} {{ product.price }}</span>
+                                        <span>₹{{ product.price }}</span>
                                         <del>₹ {{ product.price|add_amount:200  }}</del>
                                     </div>
                                 </div>
@@ -319,7 +319,7 @@
                             </div>
                             <h2 class="product-title"><a href="{{ product.get_absolute_url }}">{{product.name}}</a></h2>
                             <div class="product-price">
-                            <span>{{ request.session.currency_symbol }} {{ product.price }}</span>
+                            <span>₹{{ product.price }}</span>
                                 <del>₹35.00</del>
                             </div>
                         </div>
@@ -394,7 +394,7 @@
                             <h2 class="product-title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
                             <div class="product-price">
                                 
-                            <span>{{ request.session.currency_symbol }} {{ product.price }}</span>        
+                            <span>₹{{ product.price }}</span>        
                                 <del>₹145.00</del>
                             </div>
                         </div>
@@ -461,7 +461,7 @@
                             </div>
                             <h2 class="product-title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
                             <div class="product-price">
-                            <span>{{ request.session.currency_symbol }} {{ product.price }}</span>                                <del>₹85.00</del>
+                            <span>₹{{ product.price }}</span>                                <del>₹85.00</del>
                             </div>
                         </div>
                     </div>
