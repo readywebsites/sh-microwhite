@@ -205,150 +205,40 @@
                         <div class="widget ltn__price-filter-widget">
                             <h4 class="ltn__widget-title ltn__widget-title-border">Filter by price</h4>
                             <div class="price_filter">
-                                <div class="price_slider_amount">
-                                    <input type="submit"  value="Your range:"/> 
-                                    <input type="text" class="amount" name="price"  placeholder="Add Your Price" /> 
-                                </div>
-                                <div class="slider-range"></div>
+                                <form action="" method="GET">
+                                    <div class="price_slider_amount">
+                                        <input type="text" name="min_price" placeholder="Min Price" />
+                                        <input type="text" name="max_price" placeholder="Max Price" />
+                                        <input type="submit" value="Filter"/> 
+                                    </div>
+                                </form>
                             </div>
-                        </div>
-                        <!-- Top Rated Product Widget -->
-                        <div class="widget ltn__top-rated-product-widget">
-                            <h4 class="ltn__widget-title ltn__widget-title-border">Top Rated Product</h4>
-                            <ul>
-                                <li>
-                                    <div class="top-rated-product-item clearfix">
-                                        <div class="top-rated-product-img">
-                                            <a href="product-details.html"><img src="{% static 'img/product/1.png' %}" alt="#"></a>
-                                        </div>
-                                        <div class="top-rated-product-info">
-                                            <div class="product-ratting">
-                                                <ul>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                </ul>
-                                            </div>
-                                            <h6><a href="product-details.html">Mixel Solid Seat Cover</a></h6>
-                                            <div class="product-price">
-                                                <span>$49.00</span>
-                                                <del>$65.00</del>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="top-rated-product-item clearfix">
-                                        <div class="top-rated-product-img">
-                                            <a href="product-details.html"><img src="{% static 'img/product/2.png' %}" alt="#"></a>
-                                        </div>
-                                        <div class="top-rated-product-info">
-                                            <div class="product-ratting">
-                                                <ul>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                </ul>
-                                            </div>
-                                            <h6><a href="product-details.html">Thermometer Gun</a></h6>
-                                            <div class="product-price">
-                                                <span>$49.00</span>
-                                                <del>$65.00</del>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="top-rated-product-item clearfix">
-                                        <div class="top-rated-product-img">
-                                            <a href="product-details.html"><img src="{% static 'img/product/3.png' %}" alt="#"></a>
-                                        </div>
-                                        <div class="top-rated-product-info">
-                                            <div class="product-ratting">
-                                                <ul>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star"></i></a></li>
-                                                    <li><a href="#"><i class="fas fa-star-half-alt"></i></a></li>
-                                                    <li><a href="#"><i class="far fa-star"></i></a></li>
-                                                </ul>
-                                            </div>
-                                            <h6><a href="product-details.html">Coil Spring Conversion</a></h6>
-                                            <div class="product-price">
-                                                <span>$49.00</span>
-                                                <del>$65.00</del>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <!-- Search Widget -->
-                        <div class="widget ltn__search-widget">
-                            <h4 class="ltn__widget-title ltn__widget-title-border">Search Objects</h4>
-                            <form action="#">
-                                <input type="text" name="search" placeholder="Search your keyword...">
-                                <button type="submit"><i class="fas fa-search"></i></button>
-                            </form>
                         </div>
                         <!-- Tagcloud Widget -->
                         <div class="widget ltn__tagcloud-widget">
                             <h4 class="ltn__widget-title ltn__widget-title-border">Popular Tags</h4>
                             <ul>
-                                <li><a href="#">Body</a></li>
-                                <li><a href="#">Doctor</a></li>
-                                <li><a href="#">Drugs</a></li>
-                                <li><a href="#">Eye</a></li>
-                                <li><a href="#">Face</a></li>
-                                <li><a href="#">Hand</a></li>
-                                <li><a href="#">Mask</a></li>
-                                <li><a href="#">Medicine</a></li>
-                                <li><a href="#">Price</a></li>
-                                <li><a href="#">Sanitizer</a></li>
-                                <li><a href="#">Virus</a></li>
+                                {% for tag in all_tags %}
+                                <li><a href="?tag={{ tag }}">{{ tag }}</a></li>
+                                {% endfor %}
                             </ul>
                         </div>
                         <!-- Size Widget -->
                         <div class="widget ltn__tagcloud-widget ltn__size-widget">
                             <h4 class="ltn__widget-title ltn__widget-title-border">Product Size</h4>
                             <ul>
-                                <li><a href="#">S</a></li>
-                                <li><a href="#">M</a></li>
-                                <li><a href="#">L</a></li>
-                                <li><a href="#">XL</a></li>
-                                <li><a href="#">XXL</a></li>
+                                {% for size in all_sizes %}
+                                <li><a href="?size={{ size }}">{{ size }}</a></li>
+                                {% endfor %}
                             </ul>
                         </div>
                         <!-- Color Widget -->
                         <div class="widget ltn__color-widget">
                             <h4 class="ltn__widget-title ltn__widget-title-border">Product Color</h4>
                             <ul>
-                                <li class="black"><a href="#"></a></li>
-                                <li class="white"><a href="#"></a></li>
-                                <li class="red"><a href="#"></a></li>
-                                <li class="silver"><a href="#"></a></li>
-                                <li class="gray"><a href="#"></a></li>
-                                <li class="maroon"><a href="#"></a></li>
-                                <li class="yellow"><a href="#"></a></li>
-                                <li class="olive"><a href="#"></a></li>
-                                <li class="lime"><a href="#"></a></li>
-                                <li class="green"><a href="#"></a></li>
-                                <li class="aqua"><a href="#"></a></li>
-                                <li class="teal"><a href="#"></a></li>
-                                <li class="blue"><a href="#"></a></li>
-                                <li class="navy"><a href="#"></a></li>
-                                <li class="fuchsia"><a href="#"></a></li>
-                                <li class="purple"><a href="#"></a></li>
-                                <li class="pink"><a href="#"></a></li>
-                                <li class="nude"><a href="#"></a></li>
-                                <li class="orange"><a href="#"></a></li>
-
-                                <li><a href="#" class="orange"></a></li>
-                                <li><a href="#" class="orange"></a></li>
+                                {% for color in all_colors %}
+                                <li><a href="?color={{ color }}" class="{{ color|lower }}"></a></li>
+                                {% endfor %}
                             </ul>
                         </div>
                         <!-- Banner Widget -->

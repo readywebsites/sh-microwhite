@@ -587,10 +587,36 @@ def shop(request):
     products = Product.objects.all()
     categories = Category.objects.all()
 
+    # Extract unique tags, sizes, and colors from product titles
+    all_tags = sorted(list(set(tag for product in products for tag in product.name.split() if not tag.isdigit())))
+    all_sizes = sorted(list(set(size for product in products for size in product.name.split() if size.upper() in ['S', 'M', 'L', 'XL', 'XXL'])))
+    all_colors = sorted(list(set(color for product in products for color in product.name.split() if not color.isdigit() and not color.upper() in ['S', 'M', 'L', 'XL', 'XXL'])))
+
+
     # Filtering
     category_id = request.GET.get('category')
     if category_id:
         products = products.filter(category__id=category_id)
+
+    min_price = request.GET.get('min_price')
+    if min_price:
+        products = products.filter(price__gte=min_price)
+
+    max_price = request.GET.get('max_price')
+    if max_price:
+        products = products.filter(price__lte=max_price)
+
+    tag = request.GET.get('tag')
+    if tag:
+        products = products.filter(name__icontains=tag)
+
+    size = request.GET.get('size')
+    if size:
+        products = products.filter(name__icontains=size)
+
+    color = request.GET.get('color')
+    if color:
+        products = products.filter(name__icontains=color)
     
     # Sorting
     sort_by = request.GET.get('sort_by')
@@ -618,5 +644,8 @@ def shop(request):
     context = {
         'products': products,
         'categories': categories,
+        'all_tags': all_tags,
+        'all_sizes': all_sizes,
+        'all_colors': all_colors,
     }
     return render(request, 'shop.html', context)
