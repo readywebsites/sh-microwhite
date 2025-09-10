@@ -11,6 +11,8 @@ from django.db.models import Q
 from blog.models import Blog_Post
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from django.views.decorators.csrf import csrf_exempt
+
 CASHFREE_API_KEY = 'TEST_API_KEY'
 CASHFREE_API_SECRET = 'TEST_API_SECRET'
 CASHFREE_API_URL = 'https://sandbox.cashfree.com/pg/orders'
