@@ -40,9 +40,9 @@
         <div class="ltn__shop-details-large-img">
             {% for product_image in product.images.all %}
             <div class="single-large-img">
-                <a href="{{ product_image.image.url }}" data-rel="lightcase:myCollection">
+                <span class='zoom' id='ex{{ forloop.counter }}'>
                     <img src="{{ product_image.image.url }}" alt="{{ product.name }}">
-                </a>
+                </span>
             </div>
             {% endfor %}
         </div>
@@ -258,6 +258,15 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-zoom@1.7.21/jquery.zoom.min.js"></script>
     <script src="{% static 'assets/js/jspdf.min.js' %}"></script>
     <script src="{% static 'assets/js/html2canvas.min.js' %}"></script>
+    <script>
+        $(document).ready(function(){
+            {% for product_image in product.images.all %}
+            $('#ex{{ forloop.counter }}').zoom();
+            {% endfor %}
+        });
+    </script>
 {% endblock %}
