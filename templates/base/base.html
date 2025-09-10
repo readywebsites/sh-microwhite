@@ -601,9 +601,10 @@
                   <div class="col-md-6 col-12 align-self-center">
                       <div class="ltn__copyright-menu text-end">
                           <ul>
-                              <li><a href="#">Terms & Conditions</a></li>
-                              <li><a href="#">Claim</a></li>
-                              <li><a href="#">Privacy & Policy</a></li>
+                              <li><a href="{% url 'terms_and_conditions' %}">Terms & Conditions</a></li>
+                              <li><a href="{% url 'shipping_and_delivery_policy' %}">Shipping & Delivery Policy</a></li>
+                              <li><a href="{% url 'refund_and_cancellation_policy' %}">Refund & Cancellation Policy</a></li>
+                              <li><a href="{% url 'privacy_policy' %}">Privacy & Policy</a></li>
                           </ul>
                       </div>
                   </div>

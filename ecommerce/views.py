@@ -583,6 +583,18 @@ def authenticate_phone(phone_number):
     print(f"Using backend: {backend}")
     return user
 
+def refund_and_cancellation_policy(request):
+    return render(request, 'refund_and_cancellation_policy.html')
+
+def shipping_and_delivery_policy(request):
+    return render(request, 'shipping_and_delivery_policy.html')
+
+def terms_and_conditions(request):
+    return render(request, 'terms_and_conditions.html')
+
+def privacy_policy(request):
+    return render(request, 'privacy_policy.html')
+
 def shop(request):
     products = Product.objects.all()
     categories = Category.objects.all()
