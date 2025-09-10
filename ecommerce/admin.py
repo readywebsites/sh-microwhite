@@ -41,6 +41,3 @@ class UserAdmin(admin.ModelAdmin):
     phone_number.short_description = 'Phone Number'
 
     list_display = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'is_staff')
-
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
