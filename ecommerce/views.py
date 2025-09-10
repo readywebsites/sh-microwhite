@@ -1,14 +1,19 @@
+import json
+import requests
 from django.contrib.auth import login
 from django.shortcuts import redirect, render,get_object_or_404
 from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon, Category
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-import json
 from django.views.decorators.http import require_POST
 from .forms import OrderForm,AddressForm,UserProfileForm, UserForm
 from django.db.models import Q
 from blog.models import Blog_Post
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+CASHFREE_API_KEY = 'TEST_API_KEY'
+CASHFREE_API_SECRET = 'TEST_API_SECRET'
+CASHFREE_API_URL = 'https://sandbox.cashfree.com/pg/orders'
 
 # Create your views here.
 @require_POST
@@ -376,6 +381,7 @@ def user_profile(request):
 
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
     addresses = Address.objects.filter(user=request.user)
+    address_form = AddressForm(user=request.user)
     
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
@@ -403,9 +409,45 @@ def user_profile(request):
         'user_form': user_form,
         'profile_form': profile_form,
         'addresses': addresses,
-        'orders': orders
+        'orders': orders,
+        'address_form': address_form
     }
     return render(request, 'user_profile.html', context)
+
+@login_required
+def add_address(request):
+    if request.method == 'POST':
+        form = AddressForm(request.user, request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            address.save()
+            return redirect('user_profile')
+    return redirect('user_profile')
+
+@login_required
+def edit_address(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+    if request.method == 'POST':
+        form = AddressForm(request.user, request.POST, instance=address)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile')
+    else:
+        form = AddressForm(request.user, instance=address)
+    return render(request, 'edit_address.html', {'form': form})
+
+@login_required
+def delete_address(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+    address.delete()
+    return redirect('user_profile')
+
+@login_required
+def set_default_address(request, address_id):
+    Address.objects.filter(user=request.user, default=True).update(default=False)
+    Address.objects.filter(id=address_id, user=request.user).update(default=True)
+    return redirect('user_profile')
 
 
 def cart(request):
@@ -485,6 +527,89 @@ def invoice(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     order_products = OrderProduct.objects.filter(order=order)
     return render(request, 'invoice/general_invoice.html', {'order': order, 'order_products': order_products})
+
+@login_required
+def initiate_cashfree_payment(request):
+    if request.method == 'POST':
+        # Create an order in your database
+        user = request.user
+        cart = Cart.objects.get(user=user)
+        total = cart.get_total_price()
+
+        order_form = OrderForm(request.POST)
+        address_form = AddressForm(user, request.POST)
+
+        if address_form.is_valid() and order_form.is_valid():
+            shipping_address = address_form.save(commit=False)
+            shipping_address.user = user
+            shipping_address.save()
+
+            order = order_form.save(commit=False)
+            order.user = user
+            order.shipping_address = shipping_address
+            order.total_price = total
+            order.payment_status = 'unpaid'
+            order.status = 'pending'
+            order.save()
+
+            for cart_product in cart.cartproduct_set.all():
+                OrderProduct.objects.create(
+                    order=order,
+                    product=cart_product.product,
+                    quantity=cart_product.quantity
+                )
+
+            # Create an order with Cashfree
+            headers = {
+                "Content-Type": "application/json",
+                "x-api-version": "2022-01-01",
+                "x-client-id": CASHFREE_API_KEY,
+                "x-client-secret": CASHFREE_API_SECRET
+            }
+
+            payload = {
+                "order_id": str(order.id),
+                "order_amount": str(order.total_price),
+                "order_currency": "INR",
+                "customer_details": {
+                    "customer_id": str(user.id),
+                    "customer_name": user.get_full_name(),
+                    "customer_email": user.email,
+                    "customer_phone": user.userprofile.phone_number
+                },
+                "order_meta": {
+                    "return_url": request.build_absolute_uri(f'/cashfree-callback/?order_id={order.id}')
+                }
+            }
+
+            response = requests.post(CASHFREE_API_URL, headers=headers, json=payload)
+            cashfree_order = response.json()
+
+            return JsonResponse({'payment_session_id': cashfree_order['payment_session_id']})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def cashfree_callback(request):
+    if request.method == 'POST':
+        order_id = request.GET.get('order_id')
+        order = get_object_or_404(Order, id=order_id)
+
+        # Verify the payment with Cashfree
+        # This step is important to prevent fraud
+        # You should implement the verification logic here based on Cashfree's documentation
+
+        order.payment_status = 'paid'
+        order.save()
+
+        # Clear the cart
+        cart = Cart.objects.get(user=order.user)
+        cart.products.clear()
+
+        return redirect('order_confirmation', order_id=order.id)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 from django.contrib.auth import login
 import requests

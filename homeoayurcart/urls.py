@@ -62,11 +62,17 @@ urlpatterns = [
     path('order-tracking/<int:order_id>/', order_tracking, name='order_tracking'),
     path('invoice/<int:order_id>/', invoice, name='invoice'),
     path('profile/', user_profile, name='user_profile'),
+    path('add-address/', add_address, name='add_address'),
+    path('edit-address/<int:address_id>/', edit_address, name='edit_address'),
+    path('delete-address/<int:address_id>/', delete_address, name='delete_address'),
+    path('set-default-address/<int:address_id>/', set_default_address, name='set_default_address'),
     path('search/', search, name='search'),
     path('get-address-details/', get_address_details, name='get_address_details'),
     path('apply_coupon/', apply_coupon, name='apply_coupon'),
     path('phone-login/', phone_login, name='phone_login'),
     path('phone-callback/', phone_callback, name='phone_callback'),
+    path('initiate-cashfree-payment/', initiate_cashfree_payment, name='initiate_cashfree_payment'),
+    path('cashfree-callback/', cashfree_callback, name='cashfree_callback'),
     path('shop/', shop, name='shop'),
 
     # Sitemap

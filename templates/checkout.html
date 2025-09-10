@@ -220,13 +220,33 @@
                         <div class="ltn__checkout-payment-method mt-50">
                             <h4 class="title-2">Payment Method</h4>
                             <div id="checkout_accordion_1">
-                                <!-- card -->
-                                <div id="paypal-button-container"></div>
+                                
 
                             </div>
-                            <div class="ltn__payment-note mt-30 mb-30">
-                                <p>Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.</p>
-                            </div>
+                            <!-- card -->
+                                <div id="cashfree-payment-form"></div>
+                                <button class="btn theme-btn-1 btn-effect-1 text-uppercase" id="pay-with-cashfree">Pay with Cashfree</button>
+
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <script>
+        const cashfree = new Cashfree();
+        document.getElementById("pay-with-cashfree").addEventListener("click", function() {
+            $.ajax({
+                url: '{% url "initiate_cashfree_payment" %}',
+                method: 'POST',
+                data: $('#myform').serialize(),
+                success: function(response) {
+                    cashfree.checkout({                        
+                        paymentSessionId: response.payment_session_id,
+                        returnUrl: "{% url 'cashfree_callback' %}",
+                    });
+                },
+                error: function(response) {
+                    alert('Error initiating payment');
+                }
+            });
+        });
+    </script>
                             <!-- <button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="submit">Place order</button> -->
                         </div>
                     </div>
@@ -280,102 +300,7 @@
                 <!-- CALL TO ACTION END -->
 
 
-    <script src="https://www.paypal.com/sdk/js?client-id=AVXte74e632-CStSg55zmMRnouiMP-2ZuOV4qz53R7CKai515IOBrXL0mHbbgfwvDGFfs96PGNxnEOzc"></script>
-<!-- 
-    <script>
-        // Function to get the latest total amount
-        function getTotalAmount() {
-            return parseFloat($('#totalAmount').text()).toFixed(2);
-        }
     
-        // Render the PayPal button into #paypal-button-container
-        paypal.Buttons({
-            // Call your server to set up the transaction
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: getTotalAmount()  // Use the updated total amount
-                        }
-                    }]
-                });
-            },
-    
-            // Finalize the transaction
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    // Show a success message to the buyer
-                    alert('Transaction completed by ' +
-                    details.payer.name.given_name + '!');
-                    document.getElementById("myform").submit();
-                });
-            }
-    
-        }).render('#paypal-button-container');
-    </script> -->
-
-    <script>
-        // Function to get the latest total amount
-        function getTotalAmount() {
-            return parseFloat($('#totalAmount').text()).toFixed(2);
-        }
-    
-        // Function to validate the form fields
-        function validateForm() {
-            var isValid = true;
-    
-            // Example of field validation - adjust these selectors and checks to your actual form fields
-            if ($('#id_first_name').val().trim() === '') {
-                isValid = false;
-                alert('Please fill in the required Fields');
-            }
-            if ($('#id_last_name').val().trim() === '') {
-                isValid = false;
-                alert('Please fill in the required Fields');
-            }
-            if ($('#id_email').val().trim() === '') {
-                isValid = false;
-                alert('Please fill in the required Fields');
-            }
-            if ($('#id_phone').val().trim() === '') {
-                isValid = false;
-                alert('Please fill in the required Fields');
-            }
-            // Add more validation checks as needed...
-    
-            return isValid;
-        }
-    
-        // Render the PayPal button into #paypal-button-container
-        paypal.Buttons({
-            // Call your server to set up the transaction
-            createOrder: function(data, actions) {
-                // Validate the form before creating the order
-                if (!validateForm()) {
-                    return; // Exit if validation fails
-                }
-    
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: getTotalAmount()  // Use the updated total amount
-                        }
-                    }]
-                });
-            },
-    
-            // Finalize the transaction
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    // Show a success message to the buyer
-                    alert('Transaction completed by ' +
-                    details.payer.name.given_name + '!');
-                    document.getElementById("myform").submit(); // Submit the form after successful payment
-                });
-            }
-    
-        }).render('#paypal-button-container');
-    </script>
 <script>
     $(document).ready(function() {
         $('#id_existing_address').change(function() {

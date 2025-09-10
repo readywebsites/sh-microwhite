@@ -108,24 +108,31 @@
                                             <div class="ltn__myaccount-tab-content-inner">
                                                 <p>The following addresses will be used on the checkout page by default.</p>
                                                 <div class="row">
-                                                    <div class="col-md-6 col-12 learts-mb-30">
-                                                        <h4>Billing Address <small><a href="#">edit</a></small></h4>
-                                                        <address>
-                                                            <p><strong>{{user.userprofile.name}}</strong></p>
-                                                            <p>{{user.userprofile.address}}</p>
-                                                            <p>Mobile: {{user.userprofile.phone_number}}</p>
-                                                        </address>
-                                                    </div>
                                                     {% for address in addresses %}
                                                     <div class="col-md-6 col-12 learts-mb-30">
-                                                        <h4>Shipping Address <small><a href="#">edit</a></small></h4>
+                                                        <h4>Address {{ forloop.counter }} <small><a href="{% url 'edit_address' address.id %}">edit</a></small></h4>
                                                         <address>
                                                             <p><strong>{{address.first_name}} {{address.last_name}}</strong></p>
                                                             <p>{{address.address_line_1}}, {{address.city}}, {{address.state}}, {{address.country}}, {{address.zipcode}}</p>
                                                             <p>Mobile: {{address.phone}}</p>
                                                         </address>
+                                                        <a href="{% url 'delete_address' address.id %}" class="btn theme-btn-1 btn-effect-1 text-uppercase">Delete</a>
+                                                        {% if not address.default %}
+                                                        <a href="{% url 'set_default_address' address.id %}" class="btn theme-btn-1 btn-effect-1 text-uppercase">Set as Default</a>
+                                                        {% endif %}
                                                     </div>
                                                     {% endfor %}
+                                                </div>
+                                                <hr>
+                                                <h4>Add a new address</h4>
+                                                <div class="ltn__form-box">
+                                                    <form action="{% url 'add_address' %}" method="post">
+                                                        {% csrf_token %}
+                                                        {{ address_form.as_p }}
+                                                        <div class="btn-wrapper">
+                                                            <button type="submit" class="btn theme-btn-1 btn-effect-1 text-uppercase">Save Address</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
