@@ -34,17 +34,29 @@
                 <div class="col-lg-8 col-md-12">
                     <div class="ltn__shop-details-inner mb-60">
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="ltn__shop-details-img-gallery">
-                                    <div class="ltn__shop-details-large-img">
-                                        <div class="single-large-img">
-                                            <a href="{{ product.image.url }}" data-rel="lightcase:myCollection">
-                                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+<div class="col-md-6">
+    <div class="ltn__shop-details-img-gallery">
+        <!-- Large Images Section -->
+        <div class="ltn__shop-details-large-img">
+            {% for product_image in product.images.all %}
+            <div class="single-large-img">
+                <a href="{{ product_image.image.url }}" data-rel="lightcase:myCollection">
+                    <img src="{{ product_image.image.url }}" alt="{{ product.name }}">
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Small Thumbnails Section -->
+        <div class="ltn__shop-details-small-img slick-arrow-2">
+            {% for product_image in product.images.all %}
+            <div class="single-small-img">
+                <img src="{{ product_image.image.url }}" alt="{{ product.name }}">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
                             <div class="col-md-6">
                                 <div class="modal-product-info shop-details-info pl-0">
                                     <h3>{{ product.name }}</h3>

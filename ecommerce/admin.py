@@ -1,16 +1,21 @@
 from django.contrib import admin
-from .models import Currency,Product,Order,Address
-
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import Product, Order, Address, ProductImage, Currency
 
 
-# Register your models here.
-admin.site.register(Currency),
-admin.site.register(Product),
-admin.site.register(Order),
-admin.site.register(Address),
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
+
+
+class ProductAdmin(admin.ModelAdmin):
+    inlines = [ProductImageInline]
+
+
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Currency)
+admin.site.register(Order)
+admin.site.register(Address)
+
 
 from .models import Coupon
 
