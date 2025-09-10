@@ -50,14 +50,13 @@
         <!-- Small Thumbnails Section -->
         <div class="ltn__shop-details-small-img slick-arrow-2">
             <a class="slick-prev slick-arrow"><i class="fas fa-arrow-left" alt="Arrow Icon"></i></a>
-            <div aria-live="polite" class="slick-list draggable"><div class="slick-track" style="opacity: 1; width: 1425px; transform: translate3d(-760px, 0px, 0px);" role="listbox">
+            
             {% for product_image in product.images.all %}
             <div class="single-small-img">
                 <img src="{{ product_image.image.url }}" alt="{{ product.name }}">
             </div>
             {% endfor %}
-            </div>
-            </div>
+
             <a class="slick-next slick-arrow"><i class="fas fa-arrow-right" alt="Arrow Icon"></i></a>
         </div>
     </div>
