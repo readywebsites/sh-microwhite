@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from urllib.parse import urlencode
+from ecommerce.views import get_cart_context
 
 from .models import Blog_Post, Category, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -45,6 +46,7 @@ def search(request):
         paginated_queryset = paginator.page(1)
 
     latest = Blog_Post.objects.order_by('-Timestamp')[0:3]
+    cart_context = get_cart_context(request)
     context = {
         'category_count': category_count,
         'bloglist': paginated_queryset,
@@ -53,7 +55,7 @@ def search(request):
         'query': query,
         'category_list': category_list,
     }
-
+    context.update(cart_context)
     return render(request, 'search_result.html', context)
 
 
@@ -73,6 +75,7 @@ def blog(request):
 
     latest = Blog_Post.objects.order_by('-Timestamp')[0:3]
 
+    cart_context = get_cart_context(request)
     context = {
         'category_list': category_list,
         'category_count': category_count,
@@ -80,6 +83,7 @@ def blog(request):
         'page_request_variable': page_request_variable,
         'latest': latest,
     }
+    context.update(cart_context)
     return render(request, 'blog-grid.html', context)
 
 
@@ -121,6 +125,7 @@ def post(request, slug):
     latest = Blog_Post.objects.order_by('-Timestamp')[:3]
     comments = post.comments.filter(parent__isnull=True).order_by('-created_at')
 
+    cart_context = get_cart_context(request)
     context = {
         'post': post,
         'latest': latest,
@@ -128,13 +133,23 @@ def post(request, slug):
         'form': form,
         'reply_form': reply_form,
     }
+    context.update(cart_context)
     return render(request, 'blog-details.html', context)
 
 
 # 🔹 About Us Page
 def about(request):
+    cart_context = get_cart_context(request)
+    context = {}
+    context.update(cart_context)
     return render(request, "about.html")
 def shop(request):
+    cart_context = get_cart_context(request)
+    context = {}
+    context.update(cart_context)
     return render(request, "shop.html")
 def contact(request):
+    cart_context = get_cart_context(request)
+    context = {}
+    context.update(cart_context)
     return render(request, "contact.html")
