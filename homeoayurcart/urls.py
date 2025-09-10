@@ -9,7 +9,7 @@ from ecommerce.views import (
     CustomLoginView, phone_login, phone_callback, apply_coupon, index,
     product_details, update_cart, change_currency, toggle_wishlist,
     wishlist_view, cart, order_confirmation, past_orders, order_tracking,
-    user_profile, search, get_address_details, checkout
+    user_profile, search, get_address_details, checkout, invoice
 )
 from blog.views import post, blog, about, contact
 from ecommerce.views import shop  # 👈 contact import add karo
@@ -54,6 +54,7 @@ urlpatterns = [
     path('order-confirmation/<int:order_id>/', order_confirmation, name='order_confirmation'),
     path('past-orders/', past_orders, name='past_orders'),
     path('order-tracking/<int:order_id>/', order_tracking, name='order_tracking'),
+    path('invoice/<int:order_id>/', invoice, name='invoice'),
     path('profile/', user_profile, name='user_profile'),
     path('search/', search, name='search'),
     path('get-address-details/', get_address_details, name='get_address_details'),

@@ -56,24 +56,9 @@ class UserProfile(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)  # Added field for full name
     address = models.TextField(blank=True, null=True)
-    additional_addresses = models.TextField(blank=True, null=True)  # Can store multiple addresses in JSON format
 
     def __str__(self):
         return self.user.username
-
-    def add_address(self, address):
-        if self.additional_addresses is None:
-            self.additional_addresses = []
-        self.additional_addresses.append(address)
-        self.save()
-
-    def remove_address(self, address_index):
-        if self.additional_addresses:
-            try:
-                del self.additional_addresses[address_index]
-                self.save()
-            except IndexError:
-                pass
                 
 # Signal to create or update user profile
 from django.db.models.signals import post_save

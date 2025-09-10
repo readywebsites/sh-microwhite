@@ -38,7 +38,7 @@
                                             <a data-bs-toggle="tab" href="#liton_tab_1_3">Invoices <i class="fas fa-arrow-down"></i></a>
                                             <a data-bs-toggle="tab" href="#liton_tab_1_4">address <i class="fas fa-map-marker-alt"></i></a>
                                             <a data-bs-toggle="tab" href="#liton_tab_1_5">Account Details <i class="fas fa-user"></i></a>
-                                            <a href="login.html">Logout <i class="fas fa-sign-out-alt"></i></a>
+                                            <a href="{% url 'account_logout' %}">Logout <i class="fas fa-sign-out-alt"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -46,7 +46,7 @@
                                     <div class="tab-content">
                                         <div class="tab-pane fade active show" id="liton_tab_1_1">
                                             <div class="ltn__myaccount-tab-content-inner">
-                                                <p>Hello <strong>{{user}}</strong> (not <strong>{{user}}</strong>? <small><a href="login-register.html">Log out</a></small> )</p>
+                                                <p>Hello <strong>{{user.username}}</strong> (not <strong>{{user.username}}</strong>? <small><a href="{% url 'account_logout' %}">Log out</a></small> )</p>
                                                 <p>From your account dashboard you can view your <span>recent orders</span>, manage your <span>shipping and billing addresses</span>, and <span>edit your password and account details</span>.</p>
                                             </div>
                                         </div>
@@ -64,8 +64,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {% for order in orders|dictsortreversed:"created_at" %}
-
+                                                            {% for order in orders %}
                                                             <tr>
                                                                 <td>{{ order.pk }}</td>
                                                                 <td>{{ order.created_at }}</td>
@@ -73,22 +72,7 @@
                                                                 <td>${{order.get_total_price}}</td>
                                                                 <td><a href="{% url 'order_confirmation' order.pk %}">View</a></td>
                                                             </tr>
-
                                                             {% endfor %}
-                                                            <tr>
-                                                                <td>2</td>
-                                                                <td>Nov 22, 2019</td>
-                                                                <td>Approved</td>
-                                                                <td>$200</td>
-                                                                <td><a href="cart.html">View</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>3</td>
-                                                                <td>Jan 12, 2020</td>
-                                                                <td>On Hold</td>
-                                                                <td>$990</td>
-                                                                <td><a href="cart.html">View</a></td>
-                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -100,31 +84,21 @@
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
-                                                                <th>Product</th>
+                                                                <th>Invoice</th>
                                                                 <th>Date</th>
-                                                                <th>Expire</th>
-                                                                <th>Download</th>
+                                                                <th>Total</th>
+                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            {% for order in orders %}
                                                             <tr>
-                                                                <td>Carsafe - Car Service PSD Template</td>
-                                                                <td>Nov 22, 2020</td>
-                                                                <td>Yes</td>
-                                                                <td><a href="#"><i class="far fa-arrow-to-bottom mr-1"></i> Download File</a></td>
+                                                                <td>{{ order.get_invoice_number }}</td>
+                                                                <td>{{ order.created_at }}</td>
+                                                                <td>${{order.get_total_price}}</td>
+                                                                <td><a href="{% url 'invoice' order.pk %}">View</a></td>
                                                             </tr>
-                                                            <tr>
-                                                                <td>Carsafe - Car Service HTML Template</td>
-                                                                <td>Nov 10, 2020</td>
-                                                                <td>Yes</td>
-                                                                <td><a href="#"><i class="far fa-arrow-to-bottom mr-1"></i> Download File</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Carsafe - Car Service WordPress Theme</td>
-                                                                <td>Nov 12, 2020</td>
-                                                                <td>Yes</td>
-                                                                <td><a href="#"><i class="far fa-arrow-to-bottom mr-1"></i> Download File</a></td>
-                                                            </tr>
+                                                            {% endfor %}
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -137,21 +111,21 @@
                                                     <div class="col-md-6 col-12 learts-mb-30">
                                                         <h4>Billing Address <small><a href="#">edit</a></small></h4>
                                                         <address>
-                                                            <p><strong>Alex Tuntuni</strong></p>
-                                                            <p>1355 Market St, Suite 900 <br>
-                                                                San Francisco, CA 94103</p>
-                                                            <p>Mobile: (123) 456-7890</p>
+                                                            <p><strong>{{user.userprofile.name}}</strong></p>
+                                                            <p>{{user.userprofile.address}}</p>
+                                                            <p>Mobile: {{user.userprofile.phone_number}}</p>
                                                         </address>
                                                     </div>
+                                                    {% for address in addresses %}
                                                     <div class="col-md-6 col-12 learts-mb-30">
                                                         <h4>Shipping Address <small><a href="#">edit</a></small></h4>
                                                         <address>
-                                                            <p><strong>Alex Tuntuni</strong></p>
-                                                            <p>1355 Market St, Suite 900 <br>
-                                                                San Francisco, CA 94103</p>
-                                                            <p>Mobile: (123) 456-7890</p>
+                                                            <p><strong>{{address.first_name}} {{address.last_name}}</strong></p>
+                                                            <p>{{address.address_line_1}}, {{address.city}}, {{address.state}}, {{address.country}}, {{address.zipcode}}</p>
+                                                            <p>Mobile: {{address.phone}}</p>
                                                         </address>
                                                     </div>
+                                                    {% endfor %}
                                                 </div>
                                             </div>
                                         </div>
@@ -159,23 +133,24 @@
                                             <div class="ltn__myaccount-tab-content-inner">
                                                 <p>The following addresses will be used on the checkout page by default.</p>
                                                 <div class="ltn__form-box">
-                                                    <form action="#">
+                                                    <form action="{% url 'user_profile' %}" method="post">
+                                                        {% csrf_token %}
                                                         <div class="row mb-50">
                                                             <div class="col-md-6">
                                                                 <label>First name:</label>
-                                                                <input type="text" name="ltn__name">
+                                                                {{ user_form.first_name }}
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Last name:</label>
-                                                                <input type="text" name="ltn__lastname">
+                                                                {{ user_form.last_name }}
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Display Name:</label>
-                                                                <input type="text" name="ltn__lastname" placeholder="Ethan">
+                                                                {{ profile_form.name }}
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Display Email:</label>
-                                                                <input type="email" name="ltn__lastname" placeholder="example@example.com">
+                                                                {{ user_form.email }}
                                                             </div>
                                                         </div>
                                                         <fieldset>
@@ -183,11 +158,11 @@
                                                             <div class="row">
                                                                 <div class="col-md-12">
                                                                     <label>Current password (leave blank to leave unchanged):</label>
-                                                                    <input type="password" name="ltn__name">
+                                                                    <input type="password" name="current_password">
                                                                     <label>New password (leave blank to leave unchanged):</label>
-                                                                    <input type="password" name="ltn__lastname">
+                                                                    <input type="password" name="new_password">
                                                                     <label>Confirm new password:</label>
-                                                                    <input type="password" name="ltn__lastname">
+                                                                    <input type="password" name="confirm_password">
                                                                 </div>
                                                             </div>
                                                         </fieldset>

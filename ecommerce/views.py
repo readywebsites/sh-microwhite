@@ -1,3 +1,4 @@
+from django.contrib.auth import login
 from django.shortcuts import redirect, render,get_object_or_404
 from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon, Category
 from django.http import JsonResponse
@@ -374,6 +375,7 @@ def user_profile(request):
         return redirect('admin:index')
 
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    addresses = Address.objects.filter(user=request.user)
     
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
@@ -381,7 +383,18 @@ def user_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('user_profile')
+
+            current_password = request.POST.get('current_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+
+            if current_password and new_password and confirm_password:
+                if request.user.check_password(current_password):
+                    if new_password == confirm_password:
+                        request.user.set_password(new_password)
+                        request.user.save()
+                        login(request, request.user)  # Re-login the user to update the session
+                        return redirect('user_profile')
     else:
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=user_profile)
@@ -389,7 +402,7 @@ def user_profile(request):
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
-        'additional_addresses': user_profile.additional_addresses or [],
+        'addresses': addresses,
         'orders': orders
     }
     return render(request, 'user_profile.html', context)
@@ -467,6 +480,12 @@ def order_tracking(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'order_tracking.html', {'order': order})
 
+@login_required
+def invoice(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order_products = OrderProduct.objects.filter(order=order)
+    return render(request, 'invoice/general_invoice.html', {'order': order, 'order_products': order_products})
+
 from django.contrib.auth import login
 import requests
 
@@ -539,9 +558,6 @@ def phone_callback(request):
         user.last_name = last_name
         user.save()
 
-        # Update or create the user profile
-        create_or_update_user_profile(user, complete_phone_number, first_name, last_name)
-
         # Log the user in
         login(request, user)
 
@@ -569,23 +585,6 @@ def authenticate_phone(phone_number):
     user = authenticate(username=phone_number, backend=backend)
     print(f"Using backend: {backend}")
     return user
-
-def create_or_update_user_profile(user, phone_number, first_name='', last_name=''):
-    # Combine first and last name for the profile's display name if available
-    full_name = f"{first_name} {last_name}".strip() if first_name or last_name else None
-    user_profile, created = UserProfile.objects.get_or_create(
-        user=user,
-        defaults={
-            'phone_number': phone_number,
-            'name': full_name
-        }
-    )
-    if not created:
-        # Update the existing user profile if new values are provided
-        user_profile.phone_number = phone_number
-        if full_name:
-            user_profile.name = full_name
-        user_profile.save()
 
 def shop(request):
     products = Product.objects.all()
