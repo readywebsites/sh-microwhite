@@ -51,7 +51,7 @@ urlpatterns = [
     path('toggle-wishlist/', toggle_wishlist, name='toggle_wishlist'),
     path('wishlist/', wishlist_view, name='wishlist'),
     path('accounts/', include('allauth.urls')),
-        path('login/', allauth.account.views.LoginView.as_view(), name='account_login'),
+    path('login/', LoginView.as_view(), name='account_login'),
     path('order-confirmation/<int:order_id>/', order_confirmation, name='order_confirmation'),
     path('past-orders/', past_orders, name='past_orders'),
     path('order-tracking/<int:order_id>/', order_tracking, name='order_tracking'),
