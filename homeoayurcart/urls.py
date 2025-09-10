@@ -6,7 +6,7 @@ from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps import Sitemap
 from allauth.account.views import LoginView
 
-from ecommerce.views (
+from ecommerce.views import (
     phone_login, phone_callback, apply_coupon, index,
     product_details, update_cart, change_currency, toggle_wishlist,
     wishlist_view, cart, order_confirmation, past_orders, order_tracking,
