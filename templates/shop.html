@@ -207,20 +207,14 @@
                             <form action="" method="GET">
                                 <div class="price_filter">
                                     <div class="price_slider_amount">
-                                        <input type="text" id="min_price" name="min_price" placeholder="Min Price" />
-                                        <input type="text" id="max_price" name="max_price" placeholder="Max Price" />
+                                        <input type="text" class="amount" name="price"  placeholder="Add Your Price" /> 
                                     </div>
                                     <div class="slider-range"></div>
+                                    <input type="hidden" id="min_price" name="min_price" />
+                                    <input type="hidden" id="max_price" name="max_price" />
                                 </div>
                                 <button type="submit" class="btn theme-btn-1">Filter</button>
                             </form>
-                            <div class="short-by text-center">
-                                <select class="nice-select" onchange="location = this.value;">
-                                    <option>Sort by price</option>
-                                    <option value="?sort_by=price_low_to_high">Low to high</option>
-                                    <option value="?sort_by=price_high_to_low">High to low</option>
-                                </select>
-                            </div> 
                         </div>
                         <!-- Tagcloud Widget -->
                         <div class="widget ltn__tagcloud-widget">
@@ -286,21 +280,26 @@
 $(function() {
     var min_price_input = $("#min_price");
     var max_price_input = $("#max_price");
+    var urlParams = new URLSearchParams(window.location.search);
+    var min_price = urlParams.get('min_price') || 0;
+    var max_price = urlParams.get('max_price') || 10000;
 
     $(".slider-range").slider({
         range: true,
         min: 0,
         max: 10000, // Set a default max value
-        values: [min_price_input.val() || 0, max_price_input.val() || 10000],
+        values: [min_price, max_price],
         slide: function(event, ui) {
             min_price_input.val(ui.values[0]);
             max_price_input.val(ui.values[1]);
+            $(".amount").val("₹" + ui.values[0] + " - ₹" + ui.values[1]);
         }
     });
 
     // Set initial values
     min_price_input.val($(".slider-range").slider("values", 0));
     max_price_input.val($(".slider-range").slider("values", 1));
+    $(".amount").val("₹" + $(".slider-range").slider("values", 0) + " - ₹" + $(".slider-range").slider("values", 1));
 });
 </script>
 {% endblock %}
