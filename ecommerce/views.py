@@ -558,6 +558,19 @@ def phone_callback(request):
         user.last_name = last_name
         user.save()
 
+        # Update or create the user profile
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=user,
+            defaults={
+                'phone_number': complete_phone_number,
+                'name': f"{first_name} {last_name}".strip()
+            }
+        )
+        if not created:
+            user_profile.phone_number = complete_phone_number
+            user_profile.name = f"{first_name} {last_name}".strip()
+            user_profile.save()
+
         # Log the user in
         login(request, user)
 
