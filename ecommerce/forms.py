@@ -5,6 +5,7 @@ from ecommerce.models import UserProfile, Order, Address
 
 
 class AddressForm(forms.ModelForm):
+    country = forms.ChoiceField(choices=[('IN', 'India')], initial='IN') # Set India as the only choice
     class Meta:
         model = Address
         fields = ['first_name', 'last_name', 'email', 'phone', 'address_line_1', 'country', 'state', 'city', 'zipcode']
