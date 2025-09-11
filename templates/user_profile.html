@@ -1,6 +1,25 @@
 {% extends "base/base.html" %}
 {% block content %}
 
+<style>
+    /* Example CSS for styling dropdown */
+.custom-dropdown {
+    width: 100% ; /* Adjust width as needed */
+    padding: -1px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #333;
+}
+
+.custom-dropdown option {
+    padding: -1px;
+    font-size: 14px;
+    color: #333;
+}
+</style>
+
     <!-- BREADCRUMB AREA START -->
     <div class="ltn__breadcrumb-area text-left bg-overlay-white-30 bg-image "  data-bs-bg="img/bg/14.jpg">
         <div class="container">
@@ -137,7 +156,71 @@
                                                 <div class="ltn__form-box">
                                                     <form action="{% url 'add_address' %}" method="post">
                                                         {% csrf_token %}
-                                                        {{ address_form.as_p }}
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="{{ address_form.first_name.id_for_label }}">First Name:</label>
+                                                                    {{ address_form.first_name }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="{{ address_form.last_name.id_for_label }}">Last Name:</label>
+                                                                    {{ address_form.last_name }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="{{ address_form.email.id_for_label }}">Email:</label>
+                                                                    {{ address_form.email }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="{{ address_form.phone.id_for_label }}">Phone:</label>
+                                                                    {{ address_form.phone }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label for="{{ address_form.country.id_for_label }}">Country:</label>
+                                                                <div class="input-item">
+                                                                    {{ address_form.country|add_class:"custom-dropdown custom-country-dropdown" }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <h6>Address</h6>
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            {{ address_form.address_line_1 }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            {{ address_form.address_line_2 }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4 col-md-6">
+                                                                <h6>Town / City</h6>
+                                                                <div class="form-group">
+                                                                    {{ address_form.city }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4 col-md-6">
+                                                                <h6>State</h6>
+                                                                <div class="form-group">
+                                                                    {{ address_form.state }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4 col-md-6">
+                                                                <h6>Zip</h6>
+                                                                <div class="form-group">
+                                                                    {{ address_form.zipcode }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <div class="btn-wrapper">
                                                             <button type="submit" class="btn theme-btn-1 btn-effect-1 text-uppercase">Save Address</button>
                                                         </div>
@@ -219,4 +302,10 @@
         </div>
     </div>
     <!-- CALL TO ACTION END -->
+    <script>
+        $(document).ready(function() {
+            // Initialize nice-select for custom dropdowns
+            $('.custom-dropdown').niceSelect();
+        });
+    </script>
 {% endblock %}
