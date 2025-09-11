@@ -110,18 +110,19 @@
                                                                                     <select id="id_existing_address" name="existing_address" class="custom-dropdown">
                                                                                         <!-- Placeholder option -->
                                                                                         <option value="" {% if not address_form.instance.pk %}selected{% endif %}>
-                                                                                            {{ address_form.fields.existing_address.empty_label }}
+                                                                                            --- Add a new address ---
                                                                                         </option>
                                                                                         
                                                                                         <!-- Existing addresses options -->
                                                                                         {% for address in address_form.fields.existing_address.queryset %}
-                                                                                            <option value="{{ address.id }}">{{ address }}</option>
+                                                                                            <option value="{{ address.id }}" {% if address.default %}selected{% endif %}>{{ address }} {% if address.default %}(Default){% endif %}</option>
                                                                                         {% endfor %}
                                                                                     </select>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                     <!-- Personal Information Section -->
+                                    <div id="new_address_fields">
                                     <div class="row">
 
                                         <div class="col-md-6">
@@ -197,6 +198,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    </div> <!-- End of new_address_fields -->
                                 
                                     <!-- Order Notes and Checkbox Section -->
                                     <div class="form-group">
@@ -301,58 +303,7 @@
 
 
     
-<script>
-    $(document).ready(function() {
-        $('#id_existing_address').change(function() {
-            var addressId = $(this).val();
-            if (addressId) {
-                $.ajax({
-                    url: '{% url 'get_address_details' %}',
-                    data: {
-                        'address_id': addressId
-                    },
-                    dataType: 'json',
-                    success: function(data) {
-                        console.log("Data received from server:", data); // Debugging log
-    
-                        $('#id_first_name').val(data.first_name);
-                        $('#id_last_name').val(data.last_name);
-                        $('#id_email').val(data.email);
-                        $('#id_address_line_1').val(data.address_line_1);
-    
-                        // Set the country code for the CountryField and trigger change event
-                        if (data.country) {
-                            $('#id_country').val(data.country); // Set the country value
-                            $('#id_country').change(); // Trigger change event to update the frontend
-                            console.log("Country set to:", data.country); // Debugging log
-                        } else {
-                            console.log("Country data not found"); // Debugging log
-                        }
-    
-                        $('#id_state').val(data.state);
-                        $('#id_city').val(data.city);
-                        $('#id_zipcode').val(data.zipcode);
-                        $('#id_phone').val(data.phone);
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Error in AJAX request:", status, error); // Debugging log
-                    }
-                });
-            } else {
-                // Clear form fields if no address selected
-                $('#id_first_name').val('');
-                $('#id_last_name').val('');
-                $('#id_email').val('');
-                $('#id_address_line_1').val('');
-                $('#id_country').val('');
-                $('#id_state').val('');
-                $('#id_city').val('');
-                $('#id_zipcode').val('');
-                $('#id_phone').val('');
-            }
-        });
-    });
-    </script>
+
 
 
 <script>
@@ -392,6 +343,13 @@
 
 <script>
     $(document).ready(function() {
+        // Initial check on page load
+        if ($('#id_existing_address').val()) {
+            $('#new_address_fields').hide();
+        } else {
+            $('#new_address_fields').show();
+        }
+
         $('#id_existing_address').change(function() {
             var addressId = $(this).val();
             if (addressId) {
@@ -434,6 +392,8 @@
                         } else {
                             console.log("Country data not found"); // Debugging log
                         }
+                        // Hide new address fields when an existing address is selected
+                        $('#new_address_fields').hide();
                     },
                     error: function(xhr, status, error) {
                         console.log("Error in AJAX request:", status, error); // Debugging log
@@ -444,7 +404,8 @@
                 $('.custom-country-dropdown').val(''); // Clear the country field if no address is selected
 
                 // Update the custom dropdown UI
-
+                // Show new address fields when "Add a new address" is selected
+                $('#new_address_fields').show();
             }
         });
     });

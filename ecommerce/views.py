@@ -308,7 +308,12 @@ def checkout(request):
     
     # Initialize forms with None
     order_form = OrderForm()
-    address_form = AddressForm(user=user)
+    # Try to get the default address
+    default_address = Address.objects.filter(user=user, default=True).first()
+    if default_address:
+        address_form = AddressForm(user=user, instance=default_address)
+    else:
+        address_form = AddressForm(user=user)
     shipping_address = None
 
     print("Existing addresses queryset:")
@@ -373,6 +378,11 @@ def user_profile(request):
 
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
     addresses = Address.objects.filter(user=request.user)
+    # Ensure a default address exists, if not, set the first one as default
+    if addresses.exists() and not addresses.filter(default=True).exists():
+        first_address = addresses.first()
+        first_address.default = True
+        first_address.save()
     address_form = AddressForm(user=request.user)
     
     if request.method == 'POST':
