@@ -481,6 +481,12 @@
      {% endblock %}
 
      {% block scripts %}
+    <script>
+        $(document).ready(function() {
+            // Initialize nice-select for custom dropdowns
+            $('.custom-dropdown').niceSelect();
+        });
+    </script>
      {% endblock %}
 
      
