@@ -1,33 +1,110 @@
-import json
 import requests
-from django.contrib.auth import login
+from django.views.decorators.csrf import csrf_exempt
+# --- Cashfree Payment Integration ---
+from django.conf import settings
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+# Placeholders for your Cashfree credentials (replace with your live keys in production)
+CASHFREE_APP_ID = os.getenv("CASHFREE_APP_ID")
+CASHFREE_SECRET_KEY = os.getenv("CASHFREE_SECRET_KEY")
+CASHFREE_API_URL = 'https://api.cashfree.com/pg/orders'
+CASHFREE_API_HEADERS = {
+    'x-client-id': CASHFREE_APP_ID,
+    'x-client-secret': CASHFREE_SECRET_KEY,
+    'x-api-version': '2022-09-01',
+    'Content-Type': 'application/json',
+}
+
+@csrf_exempt
+@require_POST
+def initiate_cashfree_payment(request):
+    try:
+        data = json.loads(request.body)
+        amount = data.get('amount')
+        user = request.user if request.user.is_authenticated else None
+        cart = get_cart(request)
+        cart_products = CartProduct.objects.filter(cart=cart)
+        if not cart_products.exists():
+            return JsonResponse({'error': 'Cart is empty'}, status=400)
+
+        # Create a new order in your DB (not paid yet)
+        order = Order.objects.create(
+            user=user,
+            total_price=amount,
+            payment_status='pending',
+            status='pending',
+        )
+        for cart_product in cart_products:
+            OrderProduct.objects.create(
+                order=order,
+                product=cart_product.product,
+                quantity=cart_product.quantity
+            )
+
+        # Prepare payload for Cashfree
+        payload = {
+            "order_id": str(order.id),
+            "order_amount": str(amount),
+            "order_currency": "INR",
+            "customer_details": {
+                "customer_id": str(user.id) if user else "guest",
+                "customer_email": user.email if user else "guest@example.com",
+                "customer_phone": user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "9999999999"
+            },
+            "order_note": "Order from HomeoAyurCart",
+            "order_meta": {
+                "return_url": request.build_absolute_uri('/cashfree-callback/?order_id={order_id}')
+            }
+        }
+
+        # Call Cashfree API to create order and get payment session
+        response = requests.post(CASHFREE_API_URL, headers=CASHFREE_API_HEADERS, json=payload)
+        if response.status_code == 200:
+            resp_data = response.json()
+            payment_session_id = resp_data.get('payment_session_id')
+            if payment_session_id:
+                return JsonResponse({'payment_session_id': payment_session_id})
+            else:
+                return JsonResponse({'error': 'Failed to get payment session id'}, status=500)
+        else:
+            return JsonResponse({'error': 'Cashfree API error', 'details': response.text}, status=500)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+# Cashfree callback to mark order as paid
+@csrf_exempt
+def cashfree_callback(request):
+    order_id = request.GET.get('order_id')
+    if not order_id:
+        return JsonResponse({'error': 'Order ID missing'}, status=400)
+    try:
+        order = Order.objects.get(id=order_id)
+        order.payment_status = 'paid'
+        order.status = 'processing'
+        order.save()
+        # Optionally clear cart
+        if order.user:
+            cart = Cart.objects.filter(user=order.user).first()
+            if cart:
+                cart.products.clear()
+        return redirect('order_confirmation', order_id=order.id)
+    except Order.DoesNotExist:
+        return JsonResponse({'error': 'Order not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 from django.shortcuts import redirect, render,get_object_or_404
-from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon, Category
+from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+import json
 from django.views.decorators.http import require_POST
 from .forms import OrderForm,AddressForm,UserProfileForm, UserForm
 from django.db.models import Q
 from blog.models import Blog_Post
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
-from django.views.decorators.csrf import csrf_exempt
-
-CASHFREE_API_KEY = 'TEST_API_KEY'
-CASHFREE_API_SECRET = 'TEST_API_SECRET'
-CASHFREE_API_URL = 'https://sandbox.cashfree.com/pg/orders'
-
-def get_cart_context(request):
-    cart = get_cart(request)
-    cart_products = cart.cartproduct_set.all()
-    cart_items = cart.count_unique_items()
-    total = cart.get_total_price()
-    return {
-        'cart': cart,
-        'cart_products': cart_products,
-        'cart_items': cart_items,
-        'total': total,
-    }
 
 # Create your views here.
 @require_POST
@@ -165,23 +242,29 @@ def update_cart(request):
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+
 def index(request):
     # Fetch products and initialize cart
     products = Product.objects.all()
+    cart = get_cart(request)  # Initialize cart here
     bloglist = Blog_Post.objects.all().order_by('-Timestamp')
+    # Get cart details
+    cart_products = cart.cartproduct_set.all()
+    cart_items = cart.count_unique_items()
+    total = cart.get_total_price()
 
     selected_currency = request.session.get('currency', 'USD')
     all_currencies = Currency.objects.all()
 
+
     # Adjust product prices based on selected currency
     for product in products:
         product.price = product.get_price(selected_currency)
-    
-    cart_context = get_cart_context(request)
-    cart_products = cart_context['cart_products']
-
     for cart_product in cart_products:
         cart_product.product.price = cart_product.product.get_price(selected_currency)
+
+    # Debug: Print cart details
+    print(f"Index View - Cart: {cart}, Cart Products: {cart_products}")
 
     # Calculate currency_total
     currency_total = sum(cart_product.product.price * cart_product.quantity for cart_product in cart_products)
@@ -189,27 +272,26 @@ def index(request):
 
     context = {
         'currency_total':currency_total,
+        'cart_products': cart_products,
         'products': products,
+        'cart': cart,
+        'cart_items': cart_items,
+        'total': total,
         'selected_currency': selected_currency,
         'currencies': all_currencies,
         'bloglist':bloglist,
     }
-    context.update(cart_context)
     return render(request, 'index-2.html', context)
 
 
 def product_details(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    cart = get_cart(request)
     currencies = Currency.objects.all()  # Get all available currencies
     selected_currency = request.session.get('currency', 'USD')  # Default to USD if not set in session
 
     product_price = product.get_price(selected_currency)
-
-    # Top rated products (using price as a proxy for rating)
-    top_rated_products = Product.objects.order_by('-price')[:3]
-
-    # Related products (random products, excluding the current one)
-    related_products = Product.objects.exclude(id=product_id).order_by('?')[:3]
+    cart_items = cart.count_unique_items()
 
     product_data = {
         'id': product.id,
@@ -217,24 +299,14 @@ def product_details(request, product_id):
         'price': product_price,
         'description': product.description,
         'image_url': product.image.url,
+        'cart_items': cart_items,
         # 'categories': [category.name for category in product.categories.all()],  # Example: Assuming you have categories
     }
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse(product_data)
     else:
-        cart_context = get_cart_context(request)
-        context = {
-            'product': product,
-            'product_data': product_data,
-            'currencies': currencies,
-            'selected_currency': selected_currency,
-            'product_price': product_price,
-            'top_rated_products': top_rated_products,
-            'related_products': related_products,
-        }
-        context.update(cart_context)
-        return render(request, 'product-details.html', context)
+        return render(request, 'product-details.html', {'product': product, 'product_data': product_data, 'cart_items': cart_items, 'currencies': currencies,'selected_currency': selected_currency,'product_price': product_price})
     
 
 @require_POST
@@ -294,26 +366,26 @@ def wishlist_view(request):
         
         wishlist_items = Wishlist.objects.filter(session_id=session_key)
     
-    cart_context = get_cart_context(request)
-    context = {
-        'wishlist_items': wishlist_items
-    }
-    context.update(cart_context)
-    return render(request, 'wishlist.html', context)
+    return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
    
 @login_required
 def checkout(request):
     user = request.user
+    cart = Cart.objects.get(user=user)
+    cart_products = CartProduct.objects.filter(cart=cart)
+    total = cart.get_total_price()
+    cart_items = cart.count_unique_items()
     
     # Initialize forms with None
+    # order_form = None
+    # address_form = None
+    # shipping_address = None
+    # Debugging: Print the queryset for existing addresses
+
+    # Initialize forms with None
     order_form = OrderForm()
-    # Try to get the default address
-    default_address = Address.objects.filter(user=user, default=True).first()
-    if default_address:
-        address_form = AddressForm(user=user, instance=default_address)
-    else:
-        address_form = AddressForm(user=user)
+    address_form = AddressForm(user=user)
     shipping_address = None
 
     print("Existing addresses queryset:")
@@ -341,31 +413,34 @@ def checkout(request):
             order = order_form.save(commit=False)
             order.user = user
             order.shipping_address = shipping_address
-            order.total_price = get_cart(request).get_total_price() # Get total from cart
-            order.payment_status = 'unpaid' # Set to unpaid initially
+            order.total_price = total
+            order.payment_status = 'paid'
             order.status = 'pending'
             order.save()
 
-            for cart_product in get_cart(request).cartproduct_set.all():
+            for cart_product in cart_products:
                 OrderProduct.objects.create(
                     order=order,
                     product=cart_product.product,
                     quantity=cart_product.quantity
                 )
 
-            # Do not clear cart here, it will be cleared after successful payment
+            cart.products.clear()
 
             return redirect('order_confirmation', order_id=order.id)
     else:
         order_form = OrderForm()
         address_form = AddressForm(user=user)
 
-    cart_context = get_cart_context(request)
     context = {
         'order_form': order_form,
         'address_form': address_form,
+        'total': total,
+        'cart': cart,
+        'cart_products': cart_products,
+        'cart_items': cart_items,
     }
-    context.update(cart_context)
+
     return render(request, 'checkout.html', context)
 
 
@@ -377,13 +452,6 @@ def user_profile(request):
         return redirect('admin:index')
 
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-    addresses = Address.objects.filter(user=request.user)
-    # Ensure a default address exists, if not, set the first one as default
-    if addresses.exists() and not addresses.filter(default=True).exists():
-        first_address = addresses.first()
-        first_address.default = True
-        first_address.save()
-    address_form = AddressForm(user=request.user)
     
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
@@ -391,83 +459,26 @@ def user_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-
-            current_password = request.POST.get('current_password')
-            new_password = request.POST.get('new_password')
-            confirm_password = request.POST.get('confirm_password')
-
-            if current_password and new_password and confirm_password:
-                if request.user.check_password(current_password):
-                    if new_password == confirm_password:
-                        request.user.set_password(new_password)
-                        request.user.save()
-                        login(request, request.user)  # Re-login the user to update the session
-                        return redirect('user_profile')
+            return redirect('user_profile')
     else:
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=user_profile)
     
-    cart_context = get_cart_context(request)
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
-        'addresses': addresses,
-        'orders': orders,
-        'address_form': address_form
+        'additional_addresses': user_profile.additional_addresses or [],
+        'orders': orders
     }
-    context.update(cart_context)
     return render(request, 'user_profile.html', context)
-
-@login_required
-def add_address(request):
-    if request.method == 'POST':
-        form = AddressForm(request.user, request.POST)
-        if form.is_valid():
-            address = form.save(commit=False)
-            address.user = request.user
-            address.save()
-            return redirect('user_profile')
-    return redirect('user_profile')
-
-@login_required
-def edit_address(request, address_id):
-    address = get_object_or_404(Address, id=address_id, user=request.user)
-    if request.method == 'POST':
-        form = AddressForm(request.user, request.POST, instance=address)
-        if form.is_valid():
-            form.save()
-            return redirect('user_profile')
-    else:
-        form = AddressForm(request.user, instance=address)
-    cart_context = get_cart_context(request)
-    context = {
-        'form': form
-    }
-    context.update(cart_context)
-    return render(request, 'edit_address.html', context)
-
-@login_required
-def delete_address(request, address_id):
-    address = get_object_or_404(Address, id=address_id, user=request.user)
-    address.delete()
-    return redirect('user_profile')
-
-@login_required
-def set_default_address(request, address_id):
-    Address.objects.filter(user=request.user, default=True).update(default=False)
-    Address.objects.filter(id=address_id, user=request.user).update(default=True)
-    return redirect('user_profile')
 
 
 def cart(request):
     products = Product.objects.all()
 
-    cart_context = get_cart_context(request)
-    context = {
-        'products':products,
-    }
-    context.update(cart_context)
-    return render(request, 'cart.html', context)
+    cart = get_cart(request)
+    cart_products = CartProduct.objects.filter(cart=cart)
+    return render(request, 'cart.html', {'cart': cart, 'cart_products': cart_products,'products':products,})
 
 @login_required
 def get_address_details(request):
@@ -491,6 +502,10 @@ def get_address_details(request):
 
 def search(request):
   products = Product.objects.all()  # Fetch all products from the database
+  cart = get_cart(request)
+  cart_products = CartProduct.objects.filter(cart=cart)
+  cart_items = cart.count_unique_items()
+  total = cart.get_total_price()  # Calculate total price here
   searchlist = Product.objects.all().order_by('-price')
   query = request.GET.get('q')
 
@@ -500,141 +515,35 @@ def search(request):
       Q(description__icontains = query)   
     ).distinct()
 
-  cart_context = get_cart_context(request)
+
   context = {   
     'searchlist' : searchlist,
     'query':query,
     'products': products,
+    'cart': cart,
+    'cart_products': cart_products,
+    'cart_items' : cart_items,
+    'total' : total,
   }
-  context.update(cart_context)
+
+
   return render(request,'search_result.html',context)
 
 
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order_products = OrderProduct.objects.filter(order=order)
-    cart_context = get_cart_context(request)
-    context = {
-        'order': order,
-        'order_products': order_products
-    }
-    context.update(cart_context)
-    return render(request, 'invoice/general-invoice.html', context)
+    return render(request, 'invoice/general-invoice.html', {'order': order, 'order_products': order_products})
 
 @login_required
 def past_orders(request):
     orders = Order.objects.filter(user=request.user)
-    cart_context = get_cart_context(request)
-    context = {
-        'orders': orders
-    }
-    context.update(cart_context)
-    return render(request, 'past_orders.html', context)
+    return render(request, 'past_orders.html', {'orders': orders})
 
 @login_required
 def order_tracking(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    cart_context = get_cart_context(request)
-    context = {
-        'order': order
-    }
-    context.update(cart_context)
-    return render(request, 'order_tracking.html', context)
-
-@login_required
-def invoice(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-    order_products = OrderProduct.objects.filter(order=order)
-    cart_context = get_cart_context(request)
-    context = {
-        'order': order,
-        'order_products': order_products
-    }
-    context.update(cart_context)
-    return render(request, 'invoice/general_invoice.html', context)
-
-@login_required
-def initiate_cashfree_payment(request):
-    if request.method == 'POST':
-        # Create an order in your database
-        user = request.user
-        cart = Cart.objects.get(user=user)
-        total = cart.get_total_price()
-
-        order_form = OrderForm(request.POST)
-        address_form = AddressForm(user, request.POST)
-
-        if address_form.is_valid() and order_form.is_valid():
-            shipping_address = address_form.save(commit=False)
-            shipping_address.user = user
-            shipping_address.save()
-
-            order = order_form.save(commit=False)
-            order.user = user
-            order.shipping_address = shipping_address
-            order.total_price = total
-            order.payment_status = 'unpaid'
-            order.status = 'pending'
-            order.save()
-
-            for cart_product in cart.cartproduct_set.all():
-                OrderProduct.objects.create(
-                    order=order,
-                    product=cart_product.product,
-                    quantity=cart_product.quantity
-                )
-
-            # Create an order with Cashfree
-            headers = {
-                "Content-Type": "application/json",
-                "x-api-version": "2022-01-01",
-                "x-client-id": CASHFREE_API_KEY,
-                "x-client-secret": CASHFREE_API_SECRET
-            }
-
-            payload = {
-                "order_id": str(order.id),
-                "order_amount": str(order.total_price),
-                "order_currency": "INR",
-                "customer_details": {
-                    "customer_id": str(user.id),
-                    "customer_name": user.get_full_name(),
-                    "customer_email": user.email,
-                    "customer_phone": user.userprofile.phone_number
-                },
-                "order_meta": {
-                    "return_url": request.build_absolute_uri(f'/cashfree-callback/?order_id={order.id}')
-                }
-            }
-
-            response = requests.post(CASHFREE_API_URL, headers=headers, json=payload)
-            cashfree_order = response.json()
-
-            return JsonResponse({'payment_session_id': cashfree_order['payment_session_id']})
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@csrf_exempt
-def cashfree_callback(request):
-    if request.method == 'POST':
-        order_id = request.GET.get('order_id')
-        order = get_object_or_404(Order, id=order_id)
-
-        # Verify the payment with Cashfree
-        # This step is important to prevent fraud
-        # You should implement the verification logic here based on Cashfree's documentation
-
-        order.payment_status = 'paid'
-        order.save()
-
-        # Clear the cart
-        cart = Cart.objects.get(user=order.user)
-        cart.products.clear()
-
-        return redirect('order_confirmation', order_id=order.id)
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
+    return render(request, 'order_tracking.html', {'order': order})
 
 from django.contrib.auth import login
 import requests
@@ -642,26 +551,30 @@ import requests
 
 import logging
 
+from allauth.account.views import LoginView
+class CustomLoginView(LoginView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        CLIENT_ID = "13173857965042182049"  # Replace with your actual CLIENT_ID
+        REDIRECT_URL = self.request.build_absolute_uri('/phone-callback/')  # Adjust path as needed
+        AUTH_URL = f"https://www.phone.email/auth/log-in?client_id={CLIENT_ID}&redirect_url={REDIRECT_URL}"
+        context['auth_url'] = AUTH_URL
+        return context
+
 
 def phone_login(request):
     CLIENT_ID = "13173857965042182049"  # Replace with your actual CLIENT_ID
     REDIRECT_URL = request.build_absolute_uri('/phone-callback/')  # Adjust path as needed
     AUTH_URL = f"https://www.phone.email/auth/log-in?client_id={CLIENT_ID}&redirect_url={REDIRECT_URL}"
 
-    cart_context = get_cart_context(request)
     context = {
         'auth_url': AUTH_URL
     }
-    context.update(cart_context)
-    response =  render(request, 'phone_login.html', context)
-    response['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
-    return response
+    return render(request, 'phone_login.html', context)
 from django.contrib.auth.models import User
 from .models import UserProfile  # Import your UserProfile model
-from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
-@csrf_exempt
 def phone_callback(request):
     user_json_url = request.GET.get('user_json_url', None)
     if not user_json_url:
@@ -695,24 +608,11 @@ def phone_callback(request):
         user.save()
 
         # Update or create the user profile
-        user_profile, created = UserProfile.objects.get_or_create(
-            user=user,
-            defaults={
-                'phone_number': complete_phone_number,
-                'name': f"{first_name} {last_name}".strip()
-            }
-        )
-        if not created:
-            user_profile.phone_number = complete_phone_number
-            user_profile.name = f"{first_name} {last_name}".strip()
-            user_profile.save()
+        create_or_update_user_profile(user, complete_phone_number)
 
         # Log the user in
         login(request, user)
 
-        cart_context = get_cart_context(request)
-        context = {}
-        context.update(cart_context)
         return redirect('/')
 
 
@@ -738,99 +638,12 @@ def authenticate_phone(phone_number):
     print(f"Using backend: {backend}")
     return user
 
-def refund_and_cancellation_policy(request):
-    cart_context = get_cart_context(request)
-    context = {}
-    context.update(cart_context)
-    return render(request, 'refund_and_cancellation_policy.html', context)
-
-def shipping_and_delivery_policy(request):
-    cart_context = get_cart_context(request)
-    context = {}
-    context.update(cart_context)
-    return render(request, 'shipping_and_delivery_policy.html', context)
-
-def terms_and_conditions(request):
-    cart_context = get_cart_context(request)
-    context = {}
-    context.update(cart_context)
-    return render(request, 'terms_and_conditions.html', context)
-
-def privacy_policy(request):
-    cart_context = get_cart_context(request)
-    context = {}
-    context.update(cart_context)
-    return render(request, 'privacy_policy.html', context)
-
-def shop(request):
-    products = Product.objects.all()
-    categories = ['Men', 'Women', 'Kids', 'Accessories']
-
-    # Extract unique tags, sizes, and colors from product titles
-    all_tags = sorted(list(set(tag for product in products for tag in product.name.split() if not tag.isdigit())))
-    all_sizes = sorted(list(set(size for product in products for size in product.name.split() if size.upper() in ['S', 'M', 'L', 'XL', 'XXL'])))
-    all_colors = sorted(list(set(color for product in products for color in product.name.split() if not color.isdigit() and not color.upper() in ['S', 'M', 'L', 'XL', 'XXL'])))
-
-
-    # Filtering
-    category = request.GET.get('category')
-    if category:
-        products = products.filter(name__icontains=category)
-
-    min_price = request.GET.get('min_price')
-    if min_price:
-        products = products.filter(price__gte=min_price)
-
-    max_price = request.GET.get('max_price')
-    if max_price:
-        products = products.filter(price__lte=max_price)
-
-    tag = request.GET.get('tag')
-    if tag:
-        products = products.filter(name__icontains=tag)
-
-    size = request.GET.get('size')
-    if size:
-        products = products.filter(name__icontains=size)
-
-    color = request.GET.get('color')
-    if color:
-        products = products.filter(name__icontains=color)
-    
-    # Sorting
-    sort_by = request.GET.get('sort_by')
-    if sort_by == 'popularity':
-        products = products.order_by('-id')  # Assuming popularity is related to views or sales
-    elif sort_by == 'new_arrivals':
-        products = products.order_by('-created_at')
-    elif sort_by == 'price_low_to_high':
-        products = products.order_by('price')
-    elif sort_by == 'price_high_to_low':
-        products = products.order_by('-price')
-    elif sort_by == 'price':
-        products = products.order_by('price')
-    elif sort_by == '-price':
-        products = products.order_by('-price')
-
-    # Pagination
-    paginator = Paginator(products, 12)  # Show 12 products per page
-    page_number = request.GET.get('page')
-    try:
-        products = paginator.page(page_number)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        products = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        products = paginator.page(paginator.num_pages)
-
-    cart_context = get_cart_context(request)
-    context = {
-        'products': products,
-        'categories': categories,
-        'all_tags': all_tags,
-        'all_sizes': all_sizes,
-        'all_colors': all_colors,
-    }
-    context.update(cart_context)
-    return render(request, 'shop.html', context)
+def create_or_update_user_profile(user, phone_number):
+    user_profile, created = UserProfile.objects.get_or_create(
+        user=user,
+        defaults={'phone_number': phone_number}
+    )
+    if not created:
+        # Update existing user profile
+        user_profile.phone_number = phone_number
+        user_profile.save()

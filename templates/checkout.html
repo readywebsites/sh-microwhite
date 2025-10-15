@@ -110,19 +110,18 @@
                                                                                     <select id="id_existing_address" name="existing_address" class="custom-dropdown">
                                                                                         <!-- Placeholder option -->
                                                                                         <option value="" {% if not address_form.instance.pk %}selected{% endif %}>
-                                                                                            --- Add a new address ---
+                                                                                            {{ address_form.fields.existing_address.empty_label }}
                                                                                         </option>
                                                                                         
                                                                                         <!-- Existing addresses options -->
                                                                                         {% for address in address_form.fields.existing_address.queryset %}
-                                                                                            <option value="{{ address.id }}" {% if address.default %}selected{% endif %}>{{ address }} {% if address.default %}(Default){% endif %}</option>
+                                                                                            <option value="{{ address.id }}">{{ address }}</option>
                                                                                         {% endfor %}
                                                                                     </select>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                     <!-- Personal Information Section -->
-                                    <div id="new_address_fields">
                                     <div class="row">
 
                                         <div class="col-md-6">
@@ -198,7 +197,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    </div> <!-- End of new_address_fields -->
                                 
                                     <!-- Order Notes and Checkbox Section -->
                                     <div class="form-group">
@@ -222,33 +220,14 @@
                         <div class="ltn__checkout-payment-method mt-50">
                             <h4 class="title-2">Payment Method</h4>
                             <div id="checkout_accordion_1">
-                                
+                                <!-- card -->
+                                <!-- Cashfree Payment Button -->
+                                <button id="cashfree-pay-btn" class="btn theme-btn-1 btn-effect-1 text-uppercase" type="button">Pay with Cashfree</button>
 
                             </div>
-                            <!-- card -->
-                                <div id="cashfree-payment-form"></div>
-                                <button class="btn theme-btn-1 btn-effect-1 text-uppercase" id="pay-with-cashfree">Pay with Cashfree</button>
-
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-    <script>
-        const cashfree = new Cashfree();
-        document.getElementById("pay-with-cashfree").addEventListener("click", function() {
-            $.ajax({
-                url: '{% url "initiate_cashfree_payment" %}',
-                method: 'POST',
-                data: $('#myform').serialize(),
-                success: function(response) {
-                    cashfree.checkout({                        
-                        paymentSessionId: response.payment_session_id,
-                        returnUrl: "{% url 'cashfree_callback' %}",
-                    });
-                },
-                error: function(response) {
-                    alert('Error initiating payment');
-                }
-            });
-        });
-    </script>
+                            <div class="ltn__payment-note mt-30 mb-30">
+                                <p>Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.</p>
+                            </div>
                             <!-- <button class="btn theme-btn-1 btn-effect-1 text-uppercase" type="submit">Place order</button> -->
                         </div>
                     </div>
@@ -289,7 +268,7 @@
                             <div class="col-lg-12">
                                 <div class="call-to-action-inner call-to-action-inner-6 ltn__secondary-bg position-relative text-center---">
                                     <div class="coll-to-info text-color-white">
-                                        <h1>Find your unique style with our curated fashion collections.</h1>
+                                        <h1>Buy medical disposable face mask <br> to protect your loved ones</h1>
                                     </div>
                                     <div class="btn-wrapper">
                                         <a class="btn btn-effect-3 btn-white" href="/shop">Explore Products <i class="icon-next"></i></a>
@@ -302,8 +281,159 @@
                 <!-- CALL TO ACTION END -->
 
 
-    
 
+    <!-- Cashfree JS SDK -->
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <script>
+        document.getElementById('cashfree-pay-btn').addEventListener('click', function() {
+            // Validate form fields before payment
+            if (!validateForm()) {
+                return;
+            }
+            // Initiate payment via AJAX
+            fetch('{% url "initiate_cashfree_payment" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    amount: getTotalAmount(),
+                    // Add any other required order/customer details here
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.payment_session_id) {
+                    // Open Cashfree checkout
+                    Cashfree.checkout({
+                        paymentSessionId: data.payment_session_id,
+                        redirectTarget: '_self',
+                    });
+                } else {
+                    alert('Failed to initiate payment.');
+                }
+            })
+            .catch(error => {
+                alert('Error initiating payment.');
+            });
+        });
+    </script>
+
+    <script>
+        // Function to get the latest total amount
+        function getTotalAmount() {
+            return parseFloat($('#totalAmount').text()).toFixed(2);
+        }
+    
+        // Function to validate the form fields
+        function validateForm() {
+            var isValid = true;
+    
+            // Example of field validation - adjust these selectors and checks to your actual form fields
+            if ($('#id_first_name').val().trim() === '') {
+                isValid = false;
+                alert('Please fill in the required Fields');
+            }
+            if ($('#id_last_name').val().trim() === '') {
+                isValid = false;
+                alert('Please fill in the required Fields');
+            }
+            if ($('#id_email').val().trim() === '') {
+                isValid = false;
+                alert('Please fill in the required Fields');
+            }
+            if ($('#id_phone').val().trim() === '') {
+                isValid = false;
+                alert('Please fill in the required Fields');
+            }
+            // Add more validation checks as needed...
+    
+            return isValid;
+        }
+    
+        // Render the PayPal button into #paypal-button-container
+        paypal.Buttons({
+            // Call your server to set up the transaction
+            createOrder: function(data, actions) {
+                // Validate the form before creating the order
+                if (!validateForm()) {
+                    return; // Exit if validation fails
+                }
+    
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: getTotalAmount()  // Use the updated total amount
+                        }
+                    }]
+                });
+            },
+    
+            // Finalize the transaction
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    // Show a success message to the buyer
+                    alert('Transaction completed by ' +
+                    details.payer.name.given_name + '!');
+                    document.getElementById("myform").submit(); // Submit the form after successful payment
+                });
+            }
+    
+        }).render('#paypal-button-container');
+    </script>
+<script>
+    $(document).ready(function() {
+        $('#id_existing_address').change(function() {
+            var addressId = $(this).val();
+            if (addressId) {
+                $.ajax({
+                    url: '{% url 'get_address_details' %}',
+                    data: {
+                        'address_id': addressId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        console.log("Data received from server:", data); // Debugging log
+    
+                        $('#id_first_name').val(data.first_name);
+                        $('#id_last_name').val(data.last_name);
+                        $('#id_email').val(data.email);
+                        $('#id_address_line_1').val(data.address_line_1);
+    
+                        // Set the country code for the CountryField and trigger change event
+                        if (data.country) {
+                            $('#id_country').val(data.country); // Set the country value
+                            $('#id_country').change(); // Trigger change event to update the frontend
+                            console.log("Country set to:", data.country); // Debugging log
+                        } else {
+                            console.log("Country data not found"); // Debugging log
+                        }
+    
+                        $('#id_state').val(data.state);
+                        $('#id_city').val(data.city);
+                        $('#id_zipcode').val(data.zipcode);
+                        $('#id_phone').val(data.phone);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Error in AJAX request:", status, error); // Debugging log
+                    }
+                });
+            } else {
+                // Clear form fields if no address selected
+                $('#id_first_name').val('');
+                $('#id_last_name').val('');
+                $('#id_email').val('');
+                $('#id_address_line_1').val('');
+                $('#id_country').val('');
+                $('#id_state').val('');
+                $('#id_city').val('');
+                $('#id_zipcode').val('');
+                $('#id_phone').val('');
+            }
+        });
+    });
+    </script>
 
 
 <script>
@@ -343,13 +473,6 @@
 
 <script>
     $(document).ready(function() {
-        // Initial check on page load
-        if ($('#id_existing_address').val()) {
-            $('#new_address_fields').hide();
-        } else {
-            $('#new_address_fields').show();
-        }
-
         $('#id_existing_address').change(function() {
             var addressId = $(this).val();
             if (addressId) {
@@ -392,8 +515,6 @@
                         } else {
                             console.log("Country data not found"); // Debugging log
                         }
-                        // Hide new address fields when an existing address is selected
-                        $('#new_address_fields').hide();
                     },
                     error: function(xhr, status, error) {
                         console.log("Error in AJAX request:", status, error); // Debugging log
@@ -404,8 +525,7 @@
                 $('.custom-country-dropdown').val(''); // Clear the country field if no address is selected
 
                 // Update the custom dropdown UI
-                // Show new address fields when "Add a new address" is selected
-                $('#new_address_fields').show();
+
             }
         });
     });

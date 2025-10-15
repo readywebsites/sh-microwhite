@@ -4,17 +4,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps import Sitemap
-from allauth.account.views import LoginView
 
 from ecommerce.views import (
-    phone_login, phone_callback, apply_coupon, index,
+    CustomLoginView, phone_login, phone_callback, apply_coupon, index,
     product_details, update_cart, change_currency, toggle_wishlist,
     wishlist_view, cart, order_confirmation, past_orders, order_tracking,
-    user_profile, search, get_address_details, checkout, invoice,
-    privacy_policy, terms_and_conditions, shipping_and_delivery_policy, refund_and_cancellation_policy, initiate_cashfree_payment, cashfree_callback, add_address, edit_address, delete_address, set_default_address
+    user_profile, search, get_address_details, checkout,
+    initiate_cashfree_payment, cashfree_callback
 )
-from blog.views import post, blog, about, contact
-from ecommerce.views import shop  # 👈 contact import add karo
+from blog.views import post, blog, about, contact, shop  # 👈 contact import add karo
 
 
 # Define sitemap for static views
@@ -42,10 +40,6 @@ urlpatterns = [
     # 👇 Static Pages
     path("about/", about, name="about"),
     path("contact/", contact, name="contact"),
-    path("privacy-policy/", privacy_policy, name="privacy_policy"),
-    path("terms-and-conditions/", terms_and_conditions, name="terms_and_conditions"),
-    path("shipping-and-delivery-policy/", shipping_and_delivery_policy, name="shipping_and_delivery_policy"),
-    path("refund-and-cancellation-policy/", refund_and_cancellation_policy, name="refund_and_cancellation_policy"),
 
     # Ecommerce
     path('checkout/', checkout, name='checkout'),
@@ -56,16 +50,11 @@ urlpatterns = [
     path('toggle-wishlist/', toggle_wishlist, name='toggle_wishlist'),
     path('wishlist/', wishlist_view, name='wishlist'),
     path('accounts/', include('allauth.urls')),
-    path('login/', LoginView.as_view(), name='account_login'),
+    path('accounts/login/', CustomLoginView.as_view(), name='account_login'),
     path('order-confirmation/<int:order_id>/', order_confirmation, name='order_confirmation'),
     path('past-orders/', past_orders, name='past_orders'),
     path('order-tracking/<int:order_id>/', order_tracking, name='order_tracking'),
-    path('invoice/<int:order_id>/', invoice, name='invoice'),
     path('profile/', user_profile, name='user_profile'),
-    path('add-address/', add_address, name='add_address'),
-    path('edit-address/<int:address_id>/', edit_address, name='edit_address'),
-    path('delete-address/<int:address_id>/', delete_address, name='delete_address'),
-    path('set-default-address/<int:address_id>/', set_default_address, name='set_default_address'),
     path('search/', search, name='search'),
     path('get-address-details/', get_address_details, name='get_address_details'),
     path('apply_coupon/', apply_coupon, name='apply_coupon'),
