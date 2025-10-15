@@ -1,6 +1,8 @@
 import requests
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.views.decorators.http import require_POST
+
 
 CASHFREE_API_URL = 'https://api.cashfree.com/pg/orders'
 CASHFREE_API_HEADERS = {
@@ -93,7 +95,6 @@ from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderPro
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 import json
-from django.views.decorators.http import require_POST
 from .forms import OrderForm,AddressForm,UserProfileForm, UserForm
 from django.db.models import Q
 from blog.models import Blog_Post
