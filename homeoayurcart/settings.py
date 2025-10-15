@@ -235,6 +235,13 @@ LOGGING = {
     },
 }
 
+# Cashfree settings
+CASHFREE_API_KEY = os.environ.get('CASHFREE_API_KEY')
+CASHFREE_API_SECRET = os.environ.get('CASHFREE_API_SECRET')
+CASHFREE_API_URL = "https://api.cashfree.com/pg" # For production
+# CASHFREE_API_URL = "https://sandbox.cashfree.com/pg" # For testing
+
+
 
 SECURE_SSL_REDIRECT = True
 
