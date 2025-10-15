@@ -59,7 +59,7 @@ def initiate_cashfree_payment(request):
             "customer_details": {
                 "customer_id": str(user.id) if user else "guest",
                 "customer_email": user.email if user else "guest@example.com",
-                "customer_phone": user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "9999999999"
+                "customer_phone": user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "919898989898"
             },
             "order_note": "Order from HomeoAyurCart",
             "order_meta": {
