@@ -15,10 +15,10 @@ import os  # Added this import for the os module
 
 import environ
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
 
 
 # Quick-start development settings - unsuitable for production
