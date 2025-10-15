@@ -12,6 +12,19 @@ CASHFREE_API_HEADERS = {
     'Content-Type': 'application/json',
 }
 
+def get_cart_context(request):
+    cart = get_cart(request)
+    cart_products = cart.cartproduct_set.all()
+    cart_items = cart.count_unique_items()
+    total = cart.get_total_price()
+    return {
+        'cart': cart,
+        'cart_products': cart_products,
+        'cart_items': cart_items,
+        'total': total,
+    }
+
+
 @csrf_exempt
 @require_POST
 def initiate_cashfree_payment(request):
