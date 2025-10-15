@@ -299,7 +299,7 @@
                 },
                 body: JSON.stringify({
                     amount: getTotalAmount(),
-                    // Add any other required order/customer details here
+                    billing_details: getBillingDetails()
                 })
             })
             .then(response => response.json())
@@ -327,6 +327,21 @@
         }
     
         // Function to validate the form fields
+        function getBillingDetails() {
+            return {
+                first_name: $('#id_first_name').val(),
+                last_name: $('#id_last_name').val(),
+                email: $('#id_email').val(),
+                phone: $('#id_phone').val(),
+                address_line_1: $('#id_address_line_1').val(),
+                address_line_2: $('#id_address_line_2').val(),
+                city: $('#id_city').val(),
+                state: $('#id_state').val(),
+                zipcode: $('#id_zipcode').val(),
+                country: $('#id_country').val()
+            };
+        }
+
         function validateForm() {
             var isValid = true;
     

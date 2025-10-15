@@ -52,18 +52,25 @@ def initiate_cashfree_payment(request):
             )
 
         # Prepare payload for Cashfree
+        billing_details = data.get('billing_details', {})
+        
+        customer_id = str(user.id) if user else "guest"
+        customer_email = billing_details.get('email', user.email if user else "guest@example.com")
+        customer_phone = billing_details.get('phone', user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "919898989898")
+
         payload = {
             "order_id": str(order.id),
             "order_amount": str(order.total_price),
             "order_currency": "INR",
             "customer_details": {
-                "customer_id": str(user.id) if user else "guest",
-                "customer_email": user.email if user else "guest@example.com",
-                "customer_phone": user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "919898989898"
+                "customer_id": customer_id,
+                "customer_email": customer_email,
+                "customer_phone": customer_phone,
+                "customer_name": f"{billing_details.get('first_name', '')} {billing_details.get('last_name', '')}".strip()
             },
             "order_note": "Order from HomeoAyurCart",
             "order_meta": {
-                "return_url": request.build_absolute_uri('/cashfree-callback/?order_id={order_id}')
+                "return_url": request.build_absolute_uri(f'/cashfree-callback/?order_id={order.id}')
             }
         }
 
