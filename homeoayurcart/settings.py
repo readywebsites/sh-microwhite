@@ -241,8 +241,8 @@ LOGGING = {
 }
 
 # Cashfree settings
-CASHFREE_API_KEY = env('CASHFREE_API_KEY')
-CASHFREE_API_SECRET = env('CASHFREE_API_SECRET')
+CASHFREE_API_KEY = env('CASHFREE_API_ID')
+CASHFREE_API_SECRET = env('CASHFREE_SECRET_KEY')
 CASHFREE_API_URL = "https://api.cashfree.com/pg" # For production
 # CASHFREE_API_URL = "https://sandbox.cashfree.com/pg" # For testing
 
