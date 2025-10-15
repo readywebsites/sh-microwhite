@@ -352,35 +352,7 @@
             return isValid;
         }
     
-        // Render the PayPal button into #paypal-button-container
-        paypal.Buttons({
-            // Call your server to set up the transaction
-            createOrder: function(data, actions) {
-                // Validate the form before creating the order
-                if (!validateForm()) {
-                    return; // Exit if validation fails
-                }
-    
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: getTotalAmount()  // Use the updated total amount
-                        }
-                    }]
-                });
-            },
-    
-            // Finalize the transaction
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    // Show a success message to the buyer
-                    alert('Transaction completed by ' +
-                    details.payer.name.given_name + '!');
-                    document.getElementById("myform").submit(); // Submit the form after successful payment
-                });
-            }
-    
-        }).render('#paypal-button-container');
+        
     </script>
 <script>
     $(document).ready(function() {

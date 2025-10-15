@@ -1,22 +1,11 @@
 import requests
 from django.views.decorators.csrf import csrf_exempt
-# --- Cashfree Payment Integration ---
 from django.conf import settings
-
-# Placeholders for your Cashfree credentials (replace with your live keys in production)
-from dotenv import load_dotenv
-import os
-
-# Load environment variables from .env file
-load_dotenv()
-# Placeholders for your Cashfree credentials (replace with your live keys in production)
-CASHFREE_APP_ID = os.getenv("CASHFREE_APP_ID")
-CASHFREE_SECRET_KEY = os.getenv("CASHFREE_SECRET_KEY")
 
 CASHFREE_API_URL = 'https://api.cashfree.com/pg/orders'
 CASHFREE_API_HEADERS = {
-    'x-client-id': CASHFREE_APP_ID,
-    'x-client-secret': CASHFREE_SECRET_KEY,
+    'x-client-id': settings.CASHFREE_API_KEY,
+    'x-client-secret': settings.CASHFREE_API_SECRET,
     'x-api-version': '2022-09-01',
     'Content-Type': 'application/json',
 }

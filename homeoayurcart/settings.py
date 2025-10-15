@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -236,8 +239,8 @@ LOGGING = {
 }
 
 # Cashfree settings
-CASHFREE_API_KEY = os.environ.get('CASHFREE_API_KEY')
-CASHFREE_API_SECRET = os.environ.get('CASHFREE_API_SECRET')
+CASHFREE_API_KEY = env('CASHFREE_API_KEY')
+CASHFREE_API_SECRET = env('CASHFREE_API_SECRET')
 CASHFREE_API_URL = "https://api.cashfree.com/pg" # For production
 # CASHFREE_API_URL = "https://sandbox.cashfree.com/pg" # For testing
 
