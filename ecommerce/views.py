@@ -54,7 +54,7 @@ def initiate_cashfree_payment(request):
         # Prepare payload for Cashfree
         payload = {
             "order_id": str(order.id),
-            "order_amount": str(amount),
+            "order_amount": str(order.total_price),
             "order_currency": "INR",
             "customer_details": {
                 "customer_id": str(user.id) if user else "guest",
