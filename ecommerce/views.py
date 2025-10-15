@@ -4,8 +4,8 @@ from django.conf import settings
 
 CASHFREE_API_URL = 'https://api.cashfree.com/pg/orders'
 CASHFREE_API_HEADERS = {
-    'x-client-id': settings.CASHFREE_API_KEY,
-    'x-client-secret': settings.CASHFREE_API_SECRET,
+    'x-client-id': settings.CASHFREE_API_ID,
+    'x-client-secret': settings.CASHFREE_SECRET_KEY,
     'x-api-version': '2022-09-01',
     'Content-Type': 'application/json',
 }
