@@ -391,7 +391,12 @@ def checkout(request):
 
     # Initialize forms with None
     order_form = OrderForm()
-    address_form = AddressForm(user=user)
+    # Try to get the default address
+    default_address = Address.objects.filter(user=user, default=True).first()
+    if default_address:
+        address_form = AddressForm(user=user, instance=default_address)
+    else:
+        address_form = AddressForm(user=user)
     shipping_address = None
 
     print("Existing addresses queryset:")
@@ -653,3 +658,16 @@ def create_or_update_user_profile(user, phone_number):
         # Update existing user profile
         user_profile.phone_number = phone_number
         user_profile.save()
+
+
+def refund_and_cancellation_policy(request):
+    return render(request, 'refund_and_cancellation_policy.html')
+
+def shipping_and_delivery_policy(request):
+    return render(request, 'shipping_and_delivery_policy.html')
+
+def terms_and_conditions(request):
+    return render(request, 'terms_and_conditions.html')
+
+def privacy_policy(request):
+    return render(request, 'privacy_policy.html')
