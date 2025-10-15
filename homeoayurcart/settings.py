@@ -13,11 +13,14 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os  # Added this import for the os module
 
-import environ
-env = environ.Env()
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+load_dotenv(BASE_DIR / '.env')  # Load variables from .env into os.environ
+
+# Now access them like this:
+CASHFREE_APP_ID = os.getenv('CASHFREE_APP_ID')
+CASHFREE_API_SECRET = os.getenv('CASHFREE_API_SECRET')
 
 
 
@@ -240,11 +243,6 @@ LOGGING = {
     },
 }
 
-# Cashfree settings
-CASHFREE_API_KEY = env('CASHFREE_API_KEY')
-CASHFREE_API_SECRET = env('CASHFREE_API_SECRET')
-CASHFREE_API_URL = "https://api.cashfree.com/pg" # For production
-# CASHFREE_API_URL = "https://sandbox.cashfree.com/pg" # For testing
 
 
 
