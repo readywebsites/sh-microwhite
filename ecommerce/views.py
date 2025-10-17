@@ -2,15 +2,13 @@ import requests
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.views.decorators.http import require_POST
+from cashfree_pg.api_client import Cashfree
+from cashfree_pg.models.create_order_request import CreateOrderRequest
+from cashfree_pg.models.customer_details import CustomerDetails
+from cashfree_pg.models.order_meta import OrderMeta
 
 
-CASHFREE_API_URL = 'https://api.cashfree.com/pg/orders'
-CASHFREE_API_HEADERS = {
-    'x-client-id': settings.CASHFREE_APP_ID,
-    'x-client-secret': settings.CASHFREE_API_SECRET,
-    'x-api-version': '2022-09-01',
-    'Content-Type': 'application/json',
-}
+# The cashfree-pg library handles the API URL and headers.
 
 def get_cart_context(request):
     cart = get_cart(request)
@@ -57,34 +55,35 @@ def initiate_cashfree_payment(request):
         customer_id = str(user.id) if user else "guest"
         customer_email = billing_details.get('email', user.email if user else "guest@example.com")
         customer_phone = billing_details.get('phone', user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "919898989898")
+        customer_name = f"{billing_details.get('first_name', '')} {billing_details.get('last_name', '')}".strip()
 
-        payload = {
-            "order_id": str(order.id),
-            "order_amount": str(order.total_price),
-            "order_currency": "INR",
-            "customer_details": {
-                "customer_id": customer_id,
-                "customer_email": customer_email,
-                "customer_phone": customer_phone,
-                "customer_name": f"{billing_details.get('first_name', '')} {billing_details.get('last_name', '')}".strip()
-            },
-            "order_note": "Order from HomeoAyurCart",
-            "order_meta": {
-                "return_url": request.build_absolute_uri(f'/cashfree-callback/?order_id={order.id}')
-            }
-        }
+        env = "sandbox" if settings.DEBUG else "prod"
+        Cashfree.init(client_id=settings.CASHFREE_APP_ID, client_secret=settings.CASHFREE_API_SECRET, env=env)
 
-        # Call Cashfree API to create order and get payment session
-        response = requests.post(CASHFREE_API_URL, headers=CASHFREE_API_HEADERS, json=payload)
-        if response.status_code == 200:
-            resp_data = response.json()
-            payment_session_id = resp_data.get('payment_session_id')
-            if payment_session_id:
-                return JsonResponse({'payment_session_id': payment_session_id})
-            else:
-                return JsonResponse({'error': 'Failed to get payment session id'}, status=500)
+        create_order_request = CreateOrderRequest(
+            order_id=str(order.id),
+            order_amount=float(order.total_price),
+            order_currency="INR",
+            customer_details=CustomerDetails(
+                customer_id=customer_id,
+                customer_email=customer_email,
+                customer_phone=customer_phone,
+                customer_name=customer_name,
+            ),
+            order_meta=OrderMeta(
+                return_url=request.build_absolute_uri(f'/cashfree-callback/?order_id={order.id}')
+            ),
+            order_note="Order from HomeoAyurCart",
+        )
+        
+        api_instance = Cashfree().pg_api
+        response = api_instance.create_order(x_api_version="2022-09-01", create_order_request=create_order_request)
+
+        if response.payment_session_id:
+            return JsonResponse({'payment_session_id': response.payment_session_id})
         else:
-            return JsonResponse({'error': 'Cashfree API error', 'details': response.text}, status=500)
+            return JsonResponse({'error': 'Failed to get payment session id'}, status=500)
+
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
