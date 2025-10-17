@@ -2,7 +2,7 @@ import requests
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.views.decorators.http import require_POST
-from cashfree_pg.api_client import Cashfree
+import cashfree_pg # Import the module directly
 from cashfree_pg.models.create_order_request import CreateOrderRequest
 from cashfree_pg.models.customer_details import CustomerDetails
 from cashfree_pg.models.order_meta import OrderMeta
@@ -60,12 +60,12 @@ def initiate_cashfree_payment(request):
         env = "sandbox" if settings.DEBUG else "prod"
         
         # Corrected initialization based on error message and common patterns
-        cashfree_client = Cashfree(
+        cashfree_pg.init(
             client_id=settings.CASHFREE_APP_ID,
             client_secret=settings.CASHFREE_API_SECRET,
             env=env
         )
-        api_instance = cashfree_client.pg_api
+        api_instance = cashfree_pg.Cashfree().pg_api
 
         create_order_request = CreateOrderRequest(
             order_id=str(order.id),
