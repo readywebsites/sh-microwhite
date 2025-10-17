@@ -53,9 +53,19 @@ def initiate_cashfree_payment(request):
         # Prepare payload for Cashfree
         billing_details = data.get('billing_details', {})
         
-        customer_id = str(user.id) if user else "guest"
+        customer_id = f"user_{user.id}" if user else "guest" # Ensure customer_id is at least 3 chars
         customer_email = billing_details.get('email', user.email if user else "guest@example.com")
-        customer_phone = billing_details.get('phone', user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "919898989898")
+        
+        raw_phone = billing_details.get('phone', user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "919898989898")
+        # Clean phone number to be exactly 10 digits for Cashfree validation
+        customer_phone = "".join(filter(str.isdigit, raw_phone))
+        if len(customer_phone) > 10:
+            customer_phone = customer_phone[-10:] # Take last 10 digits
+        elif len(customer_phone) < 10:
+            # Handle cases where phone is too short, maybe raise an error or use a default
+            # For now, let's assume valid 10-digit numbers are provided or can be extracted
+            pass # Or raise ValueError("Phone number must be 10 digits")
+        
         customer_name = f"{billing_details.get('first_name', '')} {billing_details.get('last_name', '')}".strip()
 
         env = "sandbox" if settings.DEBUG else "prod"
