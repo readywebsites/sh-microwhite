@@ -59,12 +59,11 @@ def initiate_cashfree_payment(request):
 
         env = "sandbox" if settings.DEBUG else "prod"
         
-        # Corrected initialization based on error message and common patterns
-        cashfree_pg.init(
-            client_id=settings.CASHFREE_APP_ID,
-            client_secret=settings.CASHFREE_API_SECRET,
-            env=env
-        )
+        # Corrected initialization based on user's instruction
+        cashfree_pg.Cashfree.XClientId = settings.CASHFREE_APP_ID
+        cashfree_pg.Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
+        cashfree_pg.Cashfree.XEnvironment = env
+
         api_instance = cashfree_pg.Cashfree().pg_api
 
         create_order_request = CreateOrderRequest(
