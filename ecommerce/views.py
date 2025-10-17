@@ -75,9 +75,7 @@ def initiate_cashfree_payment(request):
         Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
         Cashfree.XEnvironment = env
 
-        api_instance = Cashfree() # Removed .pg_api
-        # The create_order method is likely directly on the Cashfree object
-
+        # The create_order method is likely a static method on the Cashfree class
         create_order_request = CreateOrderRequest(
             order_id=f"order_{order.id}", # Ensure order_id is at least 3 chars
             order_amount=float(order.total_price),
@@ -94,7 +92,7 @@ def initiate_cashfree_payment(request):
             order_note="Order from HomeoAyurCart",
         )
         
-        response = api_instance.create_order(x_api_version="2022-09-01", create_order_request=create_order_request)
+        response = Cashfree.create_order(x_api_version="2022-09-01", create_order_request=create_order_request)
 
         if response.payment_session_id:
             return JsonResponse({'payment_session_id': response.payment_session_id})
