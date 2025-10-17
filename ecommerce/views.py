@@ -2,7 +2,7 @@ import requests
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.views.decorators.http import require_POST
-import cashfree_pg # Import the module directly
+from cashfree_pg.api_client import Cashfree # Import Cashfree class directly
 from cashfree_pg.models.create_order_request import CreateOrderRequest
 from cashfree_pg.models.customer_details import CustomerDetails
 from cashfree_pg.models.order_meta import OrderMeta
@@ -21,6 +21,7 @@ def get_cart_context(request):
         'cart_items': cart_items,
         'total': total,
     }
+
 
 
 @csrf_exempt
@@ -60,11 +61,11 @@ def initiate_cashfree_payment(request):
         env = "sandbox" if settings.DEBUG else "prod"
         
         # Corrected initialization based on user's instruction
-        cashfree_pg.Cashfree.XClientId = settings.CASHFREE_APP_ID
-        cashfree_pg.Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
-        cashfree_pg.Cashfree.XEnvironment = env
+        Cashfree.XClientId = settings.CASHFREE_APP_ID
+        Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
+        Cashfree.XEnvironment = env
 
-        api_instance = cashfree_pg.Cashfree().pg_api
+        api_instance = Cashfree().pg_api
 
         create_order_request = CreateOrderRequest(
             order_id=str(order.id),
@@ -91,6 +92,7 @@ def initiate_cashfree_payment(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
 
 
 # Cashfree callback to mark order as paid
