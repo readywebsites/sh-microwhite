@@ -32,7 +32,7 @@ CASHFREE_API_SECRET = os.getenv('CASHFREE_API_SECRET')
 SECRET_KEY = 'django-insecure-(sw*7*05=9ojb3=x1z+7igcrfozbhl2%92r+b5=d99bxf#x*o-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
