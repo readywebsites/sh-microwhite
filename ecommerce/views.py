@@ -79,7 +79,7 @@ def initiate_cashfree_payment(request):
         # The create_order method is likely directly on the Cashfree object
 
         create_order_request = CreateOrderRequest(
-            order_id=str(order.id),
+            order_id=f"order_{order.id}", # Ensure order_id is at least 3 chars
             order_amount=float(order.total_price),
             order_currency="INR",
             customer_details=CustomerDetails(
