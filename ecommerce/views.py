@@ -65,7 +65,8 @@ def initiate_cashfree_payment(request):
         Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
         Cashfree.XEnvironment = env
 
-        api_instance = Cashfree().pg_api
+        api_instance = Cashfree() # Removed .pg_api
+        # The create_order method is likely directly on the Cashfree object
 
         create_order_request = CreateOrderRequest(
             order_id=str(order.id),
