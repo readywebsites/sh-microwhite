@@ -58,7 +58,14 @@ def initiate_cashfree_payment(request):
         customer_name = f"{billing_details.get('first_name', '')} {billing_details.get('last_name', '')}".strip()
 
         env = "sandbox" if settings.DEBUG else "prod"
-        Cashfree.init(client_id=settings.CASHFREE_APP_ID, client_secret=settings.CASHFREE_API_SECRET, env=env)
+        
+        # Corrected initialization based on error message and common patterns
+        cashfree_client = Cashfree(
+            client_id=settings.CASHFREE_APP_ID,
+            client_secret=settings.CASHFREE_API_SECRET,
+            env=env
+        )
+        api_instance = cashfree_client.pg_api
 
         create_order_request = CreateOrderRequest(
             order_id=str(order.id),
@@ -76,7 +83,6 @@ def initiate_cashfree_payment(request):
             order_note="Order from HomeoAyurCart",
         )
         
-        api_instance = Cashfree().pg_api
         response = api_instance.create_order(x_api_version="2022-09-01", create_order_request=create_order_request)
 
         if response.payment_session_id:
