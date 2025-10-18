@@ -33,16 +33,18 @@ def initiate_cashfree_payment(request):
         user = request.user if request.user.is_authenticated else None
         cart = get_cart(request)
         cart_products = CartProduct.objects.filter(cart=cart)
+        
         if not cart_products.exists():
             return JsonResponse({'error': 'Cart is empty'}, status=400)
 
-        # Create a new order in your DB (not paid yet)
+        # Create a pending order in DB
         order = Order.objects.create(
             user=user,
             total_price=amount,
             payment_status='pending',
             status='pending',
         )
+
         for cart_product in cart_products:
             OrderProduct.objects.create(
                 order=order,
@@ -50,34 +52,31 @@ def initiate_cashfree_payment(request):
                 quantity=cart_product.quantity
             )
 
-        # Prepare payload for Cashfree
         billing_details = data.get('billing_details', {})
-        
-        customer_id = f"user_{user.id}" if user else "guest" # Ensure customer_id is at least 3 chars
-        customer_email = billing_details.get('email', user.email if user else "guest@example.com")
-        
-        raw_phone = billing_details.get('phone', user.userprofile.phone_number if user and hasattr(user, 'userprofile') else "919898989898")
-        # Clean phone number to be exactly 10 digits for Cashfree validation
-        customer_phone = "".join(filter(str.isdigit, raw_phone))
-        if len(customer_phone) > 10:
-            customer_phone = customer_phone[-10:] # Take last 10 digits
-        elif len(customer_phone) < 10:
-            # Handle cases where phone is too short, maybe raise an error or use a default
-            # For now, let's assume valid 10-digit numbers are provided or can be extracted
-            pass # Or raise ValueError("Phone number must be 10 digits")
-        
-        customer_name = f"{billing_details.get('first_name', '')} {billing_details.get('last_name', '')}".strip()
+        customer_id = f"user_{user.id}" if user else "guest_user"
 
-        env = "sandbox" if settings.DEBUG else "prod"
-        
-        # Corrected initialization based on user's instruction
+        # Email validation
+        customer_email = billing_details.get('email') or (user.email if user else "guest@example.com")
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", customer_email):
+            customer_email = "guest@example.com"
+
+        # Phone number validation
+        raw_phone = billing_details.get('phone') or (getattr(user, 'userprofile', None).phone_number if user and hasattr(user, 'userprofile') else "")
+        customer_phone = ''.join(filter(str.isdigit, raw_phone))[-10:]
+        if len(customer_phone) != 10:
+            customer_phone = "9999999999"
+
+        customer_name = f"{billing_details.get('first_name', '')} {billing_details.get('last_name', '')}".strip() or "Guest User"
+
+        # Set up Cashfree SDK
         Cashfree.XClientId = settings.CASHFREE_APP_ID
         Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
-        Cashfree.XEnvironment = env
+        Cashfree.XEnvironment = Cashfree.SANDBOX if settings.DEBUG else Cashfree.PRODUCTION
+        x_api_version = "2023-08-01"
 
-        # The create_order method is likely a static method on the Cashfree class
+        # Create order request
         create_order_request = CreateOrderRequest(
-            order_id=f"order_{order.id}", # Ensure order_id is at least 3 chars
+            order_id=f"order_{order.id}",
             order_amount=float(order.total_price),
             order_currency="INR",
             customer_details=CustomerDetails(
@@ -87,21 +86,21 @@ def initiate_cashfree_payment(request):
                 customer_name=customer_name,
             ),
             order_meta=OrderMeta(
-                return_url=request.build_absolute_uri(f'/cashfree-callback/?order_id={order.id}')
+                return_url=request.build_absolute_uri(f"/cashfree-callback/?order_id={order.id}")
             ),
             order_note="Order from HomeoAyurCart",
         )
-        
-        response = Cashfree.create_order(x_api_version="2022-09-01", create_order_request=create_order_request)
 
-        if response.payment_session_id:
-            return JsonResponse({'payment_session_id': response.payment_session_id})
+        # Create order with Cashfree
+        api_response = Cashfree().PGCreateOrder(x_api_version, create_order_request, None, None)
+
+        if api_response and api_response.data.payment_session_id:
+            return JsonResponse({'payment_session_id': api_response.data.payment_session_id})
         else:
-            return JsonResponse({'error': 'Failed to get payment session id'}, status=500)
+            return JsonResponse({'error': 'Failed to create order with Cashfree'}, status=500)
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-
 
 
 # Cashfree callback to mark order as paid
@@ -110,21 +109,39 @@ def cashfree_callback(request):
     order_id = request.GET.get('order_id')
     if not order_id:
         return JsonResponse({'error': 'Order ID missing'}, status=400)
+
     try:
         order = Order.objects.get(id=order_id)
-        order.payment_status = 'paid'
-        order.status = 'processing'
-        order.save()
-        # Optionally clear cart
-        if order.user:
-            cart = Cart.objects.filter(user=order.user).first()
-            if cart:
-                cart.products.clear()
-        return redirect('order_confirmation', order_id=order.id)
+
+        # Set up Cashfree SDK again
+        Cashfree.XClientId = settings.CASHFREE_APP_ID
+        Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
+        Cashfree.XEnvironment = Cashfree.SANDBOX if settings.DEBUG else Cashfree.PRODUCTION
+        x_api_version = "2023-08-01"
+
+        # Fetch and verify order status
+        api_response = Cashfree().PGFetchOrder(x_api_version, f"order_{order.id}", None)
+
+        if api_response and api_response.data.order_status == "PAID":
+            order.payment_status = 'paid'
+            order.status = 'processing'
+            order.save()
+
+            # Optionally clear cart
+            if order.user:
+                cart = Cart.objects.filter(user=order.user).first()
+                if cart:
+                    cart.products.clear()
+
+            return redirect('order_confirmation', order_id=order.id)
+        else:
+            return JsonResponse({'error': 'Payment not completed or failed'}, status=400)
+
     except Order.DoesNotExist:
         return JsonResponse({'error': 'Order not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
 from django.shortcuts import redirect, render,get_object_or_404
 from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon
 from django.http import JsonResponse
