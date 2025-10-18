@@ -304,14 +304,10 @@
             })
             .then(response => response.json())
             .then(data => {
-                let parsedData = data;
-                if (typeof data === 'string') {
-                    parsedData = JSON.parse(data);
-                }
-                if (parsedData.payment_session_id) {
+                if (data.payment_session_id) {
                     // Open Cashfree checkout
                     Cashfree.checkout({
-                        paymentSessionId: parsedData.payment_session_id,
+                        paymentSessionId: data.payment_session_id,
                         redirectTarget: '_self',
                     });
                 } else {
