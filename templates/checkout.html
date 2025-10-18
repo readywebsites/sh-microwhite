@@ -307,11 +307,14 @@
                 return response.json();
             })
             .then(data => {
-                console.log(JSON.stringify(data, null, 2));
-                if (data.payment_session_id) {
+                let parsedData = data;
+                if (typeof data === 'string') {
+                    parsedData = JSON.parse(data);
+                }
+                if (parsedData.payment_session_id) {
                     // Open Cashfree checkout
                     Cashfree.checkout({
-                        paymentSessionId: data.payment_session_id,
+                        paymentSessionId: parsedData.payment_session_id,
                         redirectTarget: '_self',
                     });
                 } else {
