@@ -285,6 +285,10 @@
     <!-- Cashfree JS SDK -->
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <script>
+        const cashfree = Cashfree({
+            mode: "{% if settings.DEBUG %}sandbox{% else %}production{% endif %}",
+        });
+
         document.getElementById('cashfree-pay-btn').addEventListener('click', function() {
             // Validate form fields before payment
             if (!validateForm()) {
@@ -305,11 +309,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.payment_session_id) {
-                    // Open Cashfree checkout
-                    Cashfree.checkout({
+                    let checkoutOptions = {
                         paymentSessionId: data.payment_session_id,
-                        redirectTarget: '_self',
-                    });
+                        redirectTarget: "_self",
+                    };
+                    cashfree.checkout(checkoutOptions);
                 } else {
                     alert('Failed to initiate payment.');
                 }
