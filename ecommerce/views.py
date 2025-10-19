@@ -589,7 +589,12 @@ def order_confirmation(request, order_id):
 @login_required
 def past_orders(request):
     orders = Order.objects.filter(user=request.user)
-    return render(request, 'past_orders.html', {'orders': orders})
+    cart_context = get_cart_context(request)
+    context = {
+        'orders': orders
+    }
+    context.update(cart_context)
+    return render(request, 'past_orders.html', context)
 
 @login_required
 def order_tracking(request, order_id):
@@ -612,16 +617,28 @@ class CustomLoginView(LoginView):
         context['auth_url'] = AUTH_URL
         return context
 
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        response['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
+        return response
 
 def phone_login(request):
     CLIENT_ID = "13173857965042182049"  # Replace with your actual CLIENT_ID
     REDIRECT_URL = request.build_absolute_uri('/phone-callback/')  # Adjust path as needed
     AUTH_URL = f"https://www.phone.email/auth/log-in?client_id={CLIENT_ID}&redirect_url={REDIRECT_URL}"
-
+    cart_context = get_cart_context(request)
     context = {
         'auth_url': AUTH_URL
     }
-    return render(request, 'phone_login.html', context)
+
+    
+    context.update(cart_context)
+
+    response =  render(request, 'phone_login.html', context)
+
+    response['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
+
+    return response
 from django.contrib.auth.models import User
 from .models import UserProfile  # Import your UserProfile model
 
