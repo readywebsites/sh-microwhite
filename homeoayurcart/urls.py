@@ -9,7 +9,7 @@ from ecommerce.views import (
     CustomLoginView, phone_login, phone_callback, apply_coupon, index,
     product_details, update_cart, change_currency, toggle_wishlist,
     wishlist_view, cart, order_confirmation, past_orders, order_tracking, invoice,
-    user_profile, search, get_address_details, checkout,
+    user_profile, search, get_address_details, checkout, add_address,
     initiate_cashfree_payment, cashfree_callback,
     privacy_policy, terms_and_conditions, shipping_and_delivery_policy, refund_and_cancellation_policy
 )
@@ -67,6 +67,7 @@ urlpatterns = [
     path('profile/', user_profile, name='user_profile'),
     path('search/', search, name='search'),
     path('get-address-details/', get_address_details, name='get_address_details'),
+    path('add-address/', add_address, name='add_address'),
     path('apply_coupon/', apply_coupon, name='apply_coupon'),
     path('phone-login/', phone_login, name='phone_login'),
     path('phone-callback/', phone_callback, name='phone_callback'),
