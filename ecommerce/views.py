@@ -119,7 +119,43 @@ def initiate_cashfree_payment(request):
 
 
 # Cashfree callback to mark order as paid
+@csrf_exempt
+def cashfree_callback(request):
+    order_id = request.GET.get('order_id')
+    if not order_id:
+        return JsonResponse({'error': 'Order ID missing'}, status=400)
 
+    try:
+        order = Order.objects.get(id=order_id)
+
+        # Set up Cashfree SDK again
+        Cashfree.XClientId = settings.CASHFREE_APP_ID
+        Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
+        Cashfree.XEnvironment = Cashfree.SANDBOX if settings.DEBUG else Cashfree.PRODUCTION
+        x_api_version = "2023-08-01"
+
+        # Fetch and verify order status
+        api_response = Cashfree().PGFetchOrder(x_api_version, f"order_{order.id}", None)
+
+        if api_response and api_response.data.order_status == "PAID":
+            order.payment_status = 'paid'
+            order.status = 'processing'
+            order.save()
+
+            # Optionally clear cart
+            if order.user:
+                cart = Cart.objects.filter(user=order.user).first()
+                if cart:
+                    cart.products.clear()
+
+            return redirect('order_confirmation', order_id=order.id)
+        else:
+            return JsonResponse({'error': 'Payment not completed or failed'}, status=400)
+
+    except Order.DoesNotExist:
+        return JsonResponse({'error': 'Order not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
     
 from django.shortcuts import redirect, render,get_object_or_404
 from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon
@@ -402,72 +438,55 @@ def wishlist_view(request):
     }
     context.update(cart_context)
     return render(request, 'wishlist.html', context)
-   
-@login_required
+   @login_required
 def checkout(request):
     user = request.user
-
+    cart = Cart.objects.get(user=user)
+    cart_products = CartProduct.objects.filter(cart=cart)
+    total = cart.get_total_price()
+    cart_items = cart.count_unique_items()
+    
+    # Initialize forms with None
+    # order_form = None
+    # address_form = None
+    # shipping_address = None
+    # Debugging: Print the queryset for existing addresses
 
     # Initialize forms with None
     order_form = OrderForm()
-    # Try to get the default address
-    default_address = Address.objects.filter(user=user, default=True).first()
-    if default_address:
-        address_form = AddressForm(user=user, instance=default_address)
-    else:
-        address_form = AddressForm(user=user)
-    shipping_address = None
-
-    print("Existing addresses queryset:")
-    for address in address_form.fields['existing_address'].queryset:
-        print(address.id, address)
-        
-    if request.method == 'POST':
-        order_form = OrderForm(request.POST)
-        address_form = AddressForm(user, request.POST)
-
-        if 'existing_address' in request.POST:
-            address_id = request.POST['existing_address']
-            if address_id:
-                shipping_address = get_object_or_404(Address, id=address_id, user=user)
-                address_form = AddressForm(instance=shipping_address, user=user, data=request.POST)
-        else:
-            shipping_address = None
-        
-        if address_form.is_valid() and order_form.is_valid():
-            if not shipping_address:
-                shipping_address = address_form.save(commit=False)
-                shipping_address.user = user
-                shipping_address.save()
-
+@@ -464,34 +479,31 @@ def checkout(request):
             order = order_form.save(commit=False)
             order.user = user
             order.shipping_address = shipping_address
-            order.total_price = get_cart(request).get_total_price() # Get total from cart
-            order.payment_status = 'unpaid' # Set to unpaid initially
+            order.total_price = total
+            order.payment_status = 'paid'
             order.status = 'pending'
             order.save()
 
-            for cart_product in get_cart(request).cartproduct_set.all():
+            for cart_product in cart_products:
                 OrderProduct.objects.create(
                     order=order,
                     product=cart_product.product,
                     quantity=cart_product.quantity
                 )
-            # Do not clear cart here, it will be cleared after successful payment
-            # cart.products.clear()
+
+            cart.products.clear()
 
             return redirect('order_confirmation', order_id=order.id)
     else:
         order_form = OrderForm()
         address_form = AddressForm(user=user)
 
-    cart_context = get_cart_context(request)
+
     context = {
         'order_form': order_form,
         'address_form': address_form,
+        'total': total,
+        'cart': cart,
+        'cart_products': cart_products,
+        'cart_items': cart_items,
     }
-    context.update(cart_context)
+
     return render(request, 'checkout.html', context)
 
 
