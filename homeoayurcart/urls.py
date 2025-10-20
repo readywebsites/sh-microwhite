@@ -14,7 +14,9 @@ from ecommerce.views import (
     privacy_policy, terms_and_conditions, shipping_and_delivery_policy, refund_and_cancellation_policy
 )
 
-from blog.views import post, blog, about, contact, shop  # 👈 contact import add karo
+from blog.views import post, blog, about, contact # 👈 contact import add karo
+from ecommerce.views import shop  # 👈 contact import add karo
+
 
 
 # Define sitemap for static views

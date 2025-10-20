@@ -1,11 +1,25 @@
+
+import json
 import requests
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import login
+from django.shortcuts import redirect, render,get_object_or_404
+from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon, Category
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.views.decorators.http import require_POST
 from cashfree_pg.api_client import Cashfree # Import Cashfree class directly
 from cashfree_pg.models.create_order_request import CreateOrderRequest
 from cashfree_pg.models.customer_details import CustomerDetails
 from cashfree_pg.models.order_meta import OrderMeta
+
+
+
+from .forms import OrderForm,AddressForm,UserProfileForm, UserForm
+from django.db.models import Q
+from blog.models import Blog_Post
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.csrf import csrf_exempt
 
 import re
 
@@ -292,12 +306,8 @@ def update_cart(request):
 def index(request):
     # Fetch products and initialize cart
     products = Product.objects.all()
-    cart = get_cart(request)  # Initialize cart here
     bloglist = Blog_Post.objects.all().order_by('-Timestamp')
     # Get cart details
-    cart_products = cart.cartproduct_set.all()
-    cart_items = cart.count_unique_items()
-    total = cart.get_total_price()
 
     selected_currency = request.session.get('currency', 'USD')
     all_currencies = Currency.objects.all()
@@ -306,6 +316,10 @@ def index(request):
     # Adjust product prices based on selected currency
     for product in products:
         product.price = product.get_price(selected_currency)
+    
+    cart_context = get_cart_context(request)
+    cart_products = cart_context['cart_products']
+
     for cart_product in cart_products:
         cart_product.product.price = cart_product.product.get_price(selected_currency)
 
@@ -318,15 +332,12 @@ def index(request):
 
     context = {
         'currency_total':currency_total,
-        'cart_products': cart_products,
         'products': products,
-        'cart': cart,
-        'cart_items': cart_items,
-        'total': total,
         'selected_currency': selected_currency,
         'currencies': all_currencies,
         'bloglist':bloglist,
     }
+    context.update(cart_context)
     return render(request, 'index-2.html', context)
 
 
@@ -337,23 +348,33 @@ def product_details(request, product_id):
     selected_currency = request.session.get('currency', 'USD')  # Default to USD if not set in session
 
     product_price = product.get_price(selected_currency)
-    cart_items = cart.count_unique_items()
-
+    # Top rated products (using price as a proxy for rating)
+    top_rated_products = Product.objects.order_by('-price')[:3]
+    related_products = Product.objects.exclude(id=product_id).order_by('?')[:3]
     product_data = {
         'id': product.id,
         'name': product.name,
         'price': product_price,
         'description': product.description,
         'image_url': product.image.url,
-        'cart_items': cart_items,
         # 'categories': [category.name for category in product.categories.all()],  # Example: Assuming you have categories
     }
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse(product_data)
-    else:
-        return render(request, 'product-details.html', {'product': product, 'product_data': product_data, 'cart_items': cart_items, 'currencies': currencies,'selected_currency': selected_currency,'product_price': product_price})
-    
+    else:        
+        cart_context = get_cart_context(request)
+        context = {
+            'product': product,
+            'product_data': product_data,
+            'currencies': currencies,
+            'selected_currency': selected_currency,
+            'product_price': product_price,
+            'top_rated_products': top_rated_products,
+            'related_products': related_products,
+        }
+        context.update(cart_context)
+        return render(request, 'product-details.html', context)
 
 @require_POST
 def toggle_wishlist(request):
@@ -410,24 +431,18 @@ def wishlist_view(request):
             request.session.save()  # Ensure the session key is created
             session_key = request.session.session_key
         
-        wishlist_items = Wishlist.objects.filter(session_id=session_key)
-    
-    return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
-
+        wishlist_items = Wishlist.objects.filter(session_id=session_key)    
+    cart_context = get_cart_context(request)
+    context = {
+        'wishlist_items': wishlist_items
+    }
+    context.update(cart_context)
+    return render(request, 'wishlist.html', context)
    
 @login_required
 def checkout(request):
     user = request.user
-    cart = Cart.objects.get(user=user)
-    cart_products = CartProduct.objects.filter(cart=cart)
-    total = cart.get_total_price()
-    cart_items = cart.count_unique_items()
-    
-    # Initialize forms with None
-    # order_form = None
-    # address_form = None
-    # shipping_address = None
-    # Debugging: Print the queryset for existing addresses
+
 
     # Initialize forms with None
     order_form = OrderForm()
@@ -464,34 +479,31 @@ def checkout(request):
             order = order_form.save(commit=False)
             order.user = user
             order.shipping_address = shipping_address
-            order.total_price = total
-            order.payment_status = 'paid'
+            order.total_price = get_cart(request).get_total_price() # Get total from cart
+            order.payment_status = 'unpaid' # Set to unpaid initially
             order.status = 'pending'
             order.save()
 
-            for cart_product in cart_products:
+            for cart_product in get_cart(request).cartproduct_set.all():
                 OrderProduct.objects.create(
                     order=order,
                     product=cart_product.product,
                     quantity=cart_product.quantity
                 )
-
-            cart.products.clear()
+            # Do not clear cart here, it will be cleared after successful payment
+            # cart.products.clear()
 
             return redirect('order_confirmation', order_id=order.id)
     else:
         order_form = OrderForm()
         address_form = AddressForm(user=user)
 
+    cart_context = get_cart_context(request)
     context = {
         'order_form': order_form,
         'address_form': address_form,
-        'total': total,
-        'cart': cart,
-        'cart_products': cart_products,
-        'cart_items': cart_items,
     }
-
+    context.update(cart_context)
     return render(request, 'checkout.html', context)
 
 
@@ -504,32 +516,97 @@ def user_profile(request):
 
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
     
+    addresses = Address.objects.filter(user=request.user)
+    # Ensure a default address exists, if not, set the first one as default
+    if addresses.exists() and not addresses.filter(default=True).exists():
+        first_address = addresses.first()
+        first_address.default = True
+        first_address.save()
+    address_form = AddressForm(user=request.user)
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, instance=user_profile)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('user_profile')
+            current_password = request.POST.get('current_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+            if current_password and new_password and confirm_password:
+                if request.user.check_password(current_password):
+                    if new_password == confirm_password:
+                        request.user.set_password(new_password)
+                        request.user.save()
+                        login(request, request.user)  # Re-login the user to update the session
+                        return redirect('user_profile')
+
+ 
     else:
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=user_profile)
     
+    cart_context = get_cart_context(request)
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
-        'additional_addresses': user_profile.additional_addresses or [],
-        'orders': orders
+        'addresses': addresses,
+        'orders': orders,
+        'address_form': address_form
     }
+    context.update(cart_context)
     return render(request, 'user_profile.html', context)
+
+@login_required
+def add_address(request):
+    if request.method == 'POST':
+        form = AddressForm(request.user, request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            address.save()
+            return redirect('user_profile')
+    return redirect('user_profile')
+
+@login_required
+def edit_address(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+    if request.method == 'POST':
+        form = AddressForm(request.user, request.POST, instance=address)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile')
+    else:
+        form = AddressForm(request.user, instance=address)
+    cart_context = get_cart_context(request)
+    context = {
+        'form': form
+    }
+    context.update(cart_context)
+    return render(request, 'edit_address.html', context)
+
+
+@login_required
+def delete_address(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+    address.delete()
+    return redirect('user_profile')
+
+
+@login_required
+def set_default_address(request, address_id):
+    Address.objects.filter(user=request.user, default=True).update(default=False)
+    Address.objects.filter(id=address_id, user=request.user).update(default=True)
+    return redirect('user_profile')
 
 
 def cart(request):
     products = Product.objects.all()
-
-    cart = get_cart(request)
-    cart_products = CartProduct.objects.filter(cart=cart)
-    return render(request, 'cart.html', {'cart': cart, 'cart_products': cart_products,'products':products,})
+    cart_context = get_cart_context(request)
+    context = {
+        'products':products,
+    }
+    context.update(cart_context)
+    return render(request, 'cart.html', context)
 
 @login_required
 def get_address_details(request):
@@ -553,10 +630,7 @@ def get_address_details(request):
 
 def search(request):
   products = Product.objects.all()  # Fetch all products from the database
-  cart = get_cart(request)
-  cart_products = CartProduct.objects.filter(cart=cart)
-  cart_items = cart.count_unique_items()
-  total = cart.get_total_price()  # Calculate total price here
+  cart_context = get_cart_context(request)
   searchlist = Product.objects.all().order_by('-price')
   query = request.GET.get('q')
 
@@ -571,11 +645,9 @@ def search(request):
     'searchlist' : searchlist,
     'query':query,
     'products': products,
-    'cart': cart,
-    'cart_products': cart_products,
-    'cart_items' : cart_items,
-    'total' : total,
+
   }
+  context.update(cart_context)
 
 
   return render(request,'search_result.html',context)
@@ -584,8 +656,13 @@ def search(request):
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order_products = OrderProduct.objects.filter(order=order)
-    return render(request, 'invoice/general-invoice.html', {'order': order, 'order_products': order_products})
-
+    cart_context = get_cart_context(request)
+    context = {
+        'order': order,
+        'order_products': order_products
+    }
+    context.update(cart_context)
+    return render(request, 'invoice/general-invoice.html', context)
 @login_required
 def past_orders(request):
     orders = Order.objects.filter(user=request.user)
@@ -599,7 +676,69 @@ def past_orders(request):
 @login_required
 def order_tracking(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    return render(request, 'order_tracking.html', {'order': order})
+    cart_context = get_cart_context(request)
+    context = {
+        'order': order
+    }
+    context.update(cart_context)
+    return render(request, 'order_tracking.html', context)
+
+
+
+
+@login_required
+def invoice(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order_products = OrderProduct.objects.filter(order=order)
+    cart_context = get_cart_context(request)
+    context = {
+        'order': order,
+        'order_products': order_products
+    }
+    context.update(cart_context)
+    return render(request, 'invoice/general_invoice.html', context)
+
+
+@csrf_exempt
+
+def cashfree_callback(request):
+
+    if request.method == 'POST':
+
+        order_id = request.GET.get('order_id')
+
+        order = get_object_or_404(Order, id=order_id)
+
+
+
+        # Verify the payment with Cashfree
+
+        # This step is important to prevent fraud
+
+        # You should implement the verification logic here based on Cashfree's documentation
+
+
+
+        order.payment_status = 'paid'
+
+        order.save()
+
+
+
+        # Clear the cart
+
+        cart = Cart.objects.get(user=order.user)
+
+        cart.products.clear()
+
+
+
+        return redirect('order_confirmation', order_id=order.id)
+
+
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 from django.contrib.auth import login
 import requests
@@ -622,6 +761,7 @@ class CustomLoginView(LoginView):
         response['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
         return response
 
+
 def phone_login(request):
     CLIENT_ID = "13173857965042182049"  # Replace with your actual CLIENT_ID
     REDIRECT_URL = request.build_absolute_uri('/phone-callback/')  # Adjust path as needed
@@ -643,6 +783,8 @@ from django.contrib.auth.models import User
 from .models import UserProfile  # Import your UserProfile model
 
 logger = logging.getLogger(__name__)
+
+@csrf_exempt
 def phone_callback(request):
     user_json_url = request.GET.get('user_json_url', None)
     if not user_json_url:
@@ -676,11 +818,37 @@ def phone_callback(request):
         user.save()
 
         # Update or create the user profile
-        create_or_update_user_profile(user, complete_phone_number)
+
+        user_profile, created = UserProfile.objects.get_or_create(
+
+            user=user,
+
+            defaults={
+
+                'phone_number': complete_phone_number,
+
+                'name': f"{first_name} {last_name}".strip()
+
+            }
+
+        )
+
+        if not created:
+
+            user_profile.phone_number = complete_phone_number
+
+            user_profile.name = f"{first_name} {last_name}".strip()
+
+            user_profile.save()
 
         # Log the user in
         login(request, user)
 
+        cart_context = get_cart_context(request)
+
+        context = {}
+
+        context.update(cart_context)
         return redirect('/')
 
 
@@ -716,15 +884,194 @@ def create_or_update_user_profile(user, phone_number):
         user_profile.phone_number = phone_number
         user_profile.save()
 
-
 def refund_and_cancellation_policy(request):
-    return render(request, 'refund_and_cancellation_policy.html')
+
+    cart_context = get_cart_context(request)
+
+    context = {}
+
+    context.update(cart_context)
+
+    return render(request, 'refund_and_cancellation_policy.html', context)
+
+
 
 def shipping_and_delivery_policy(request):
-    return render(request, 'shipping_and_delivery_policy.html')
+
+    cart_context = get_cart_context(request)
+
+    context = {}
+
+    context.update(cart_context)
+
+    return render(request, 'shipping_and_delivery_policy.html', context)
+
+
 
 def terms_and_conditions(request):
-    return render(request, 'terms_and_conditions.html')
+
+    cart_context = get_cart_context(request)
+
+    context = {}
+
+    context.update(cart_context)
+
+    return render(request, 'terms_and_conditions.html', context)
+
+
 
 def privacy_policy(request):
-    return render(request, 'privacy_policy.html')
+
+    cart_context = get_cart_context(request)
+
+    context = {}
+
+    context.update(cart_context)
+
+    return render(request, 'privacy_policy.html', context)
+
+
+
+def shop(request):
+
+    products = Product.objects.all()
+
+    categories = ['Men', 'Women', 'Kids', 'Accessories']
+
+
+
+    # Extract unique tags, sizes, and colors from product titles
+
+    all_tags = sorted(list(set(tag for product in products for tag in product.name.split() if not tag.isdigit())))
+
+    all_sizes = sorted(list(set(size for product in products for size in product.name.split() if size.upper() in ['S', 'M', 'L', 'XL', 'XXL'])))
+
+    all_colors = sorted(list(set(color for product in products for color in product.name.split() if not color.isdigit() and not color.upper() in ['S', 'M', 'L', 'XL', 'XXL'])))
+
+
+
+
+
+    # Filtering
+
+    category = request.GET.get('category')
+
+    if category:
+
+        products = products.filter(name__icontains=category)
+
+
+
+    min_price = request.GET.get('min_price')
+
+    if min_price:
+
+        products = products.filter(price__gte=min_price)
+
+
+
+    max_price = request.GET.get('max_price')
+
+    if max_price:
+
+        products = products.filter(price__lte=max_price)
+
+
+
+    tag = request.GET.get('tag')
+
+    if tag:
+
+        products = products.filter(name__icontains=tag)
+
+
+
+    size = request.GET.get('size')
+
+    if size:
+
+        products = products.filter(name__icontains=size)
+
+
+
+    color = request.GET.get('color')
+
+    if color:
+
+        products = products.filter(name__icontains=color)
+
+    
+
+    # Sorting
+
+    sort_by = request.GET.get('sort_by')
+
+    if sort_by == 'popularity':
+
+        products = products.order_by('-id')  # Assuming popularity is related to views or sales
+
+    elif sort_by == 'new_arrivals':
+
+        products = products.order_by('-created_at')
+
+    elif sort_by == 'price_low_to_high':
+
+        products = products.order_by('price')
+
+    elif sort_by == 'price_high_to_low':
+
+        products = products.order_by('-price')
+
+    elif sort_by == 'price':
+
+        products = products.order_by('price')
+
+    elif sort_by == '-price':
+
+        products = products.order_by('-price')
+
+
+
+    # Pagination
+
+    paginator = Paginator(products, 12)  # Show 12 products per page
+
+    page_number = request.GET.get('page')
+
+    try:
+
+        products = paginator.page(page_number)
+
+    except PageNotAnInteger:
+
+        # If page is not an integer, deliver first page.
+
+        products = paginator.page(1)
+
+    except EmptyPage:
+
+        # If page is out of range (e.g. 9999), deliver last page of results.
+
+        products = paginator.page(paginator.num_pages)
+
+
+
+    cart_context = get_cart_context(request)
+
+    context = {
+
+        'products': products,
+
+        'categories': categories,
+
+        'all_tags': all_tags,
+
+        'all_sizes': all_sizes,
+
+        'all_colors': all_colors,
+
+    }
+
+    context.update(cart_context)
+
+    return render(request, 'shop.html', context)
