@@ -8,7 +8,7 @@ from django.contrib.sitemaps import Sitemap
 from ecommerce.views import (
     CustomLoginView, phone_login, phone_callback, apply_coupon, index,
     product_details, update_cart, change_currency, toggle_wishlist,
-    wishlist_view, cart, order_confirmation, past_orders, order_tracking,
+    wishlist_view, cart, order_confirmation, past_orders, order_tracking, invoice,
     user_profile, search, get_address_details, checkout,
     initiate_cashfree_payment, cashfree_callback,
     privacy_policy, terms_and_conditions, shipping_and_delivery_policy, refund_and_cancellation_policy
@@ -63,6 +63,7 @@ urlpatterns = [
     path('order-confirmation/<int:order_id>/', order_confirmation, name='order_confirmation'),
     path('past-orders/', past_orders, name='past_orders'),
     path('order-tracking/<int:order_id>/', order_tracking, name='order_tracking'),
+    path('invoice/<int:order_id>/', invoice, name='invoice'),
     path('profile/', user_profile, name='user_profile'),
     path('search/', search, name='search'),
     path('get-address-details/', get_address_details, name='get_address_details'),
