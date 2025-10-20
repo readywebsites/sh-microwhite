@@ -1,4 +1,5 @@
 
+#sorted k idk
 import json
 import requests
 from django.contrib.auth import login
@@ -438,21 +439,11 @@ def wishlist_view(request):
     }
     context.update(cart_context)
     return render(request, 'wishlist.html', context)
-
-
+   
 @login_required
 def checkout(request):
     user = request.user
-    cart = Cart.objects.get(user=user)
-    cart_products = CartProduct.objects.filter(cart=cart)
-    total = cart.get_total_price()
-    cart_items = cart.count_unique_items()
-    
-    # Initialize forms with None
-    # order_form = None
-    # address_form = None
-    # shipping_address = None
-    # Debugging: Print the queryset for existing addresses
+
 
     # Initialize forms with None
     order_form = OrderForm()
@@ -489,35 +480,33 @@ def checkout(request):
             order = order_form.save(commit=False)
             order.user = user
             order.shipping_address = shipping_address
-            order.total_price = total
-            order.payment_status = 'paid'
+            order.total_price = get_cart(request).get_total_price() # Get total from cart
+            order.payment_status = 'unpaid' # Set to unpaid initially
             order.status = 'pending'
             order.save()
 
-            for cart_product in cart_products:
+            for cart_product in get_cart(request).cartproduct_set.all():
                 OrderProduct.objects.create(
                     order=order,
                     product=cart_product.product,
                     quantity=cart_product.quantity
                 )
-
-            cart.products.clear()
+            # Do not clear cart here, it will be cleared after successful payment
+            # cart.products.clear()
 
             return redirect('order_confirmation', order_id=order.id)
     else:
         order_form = OrderForm()
         address_form = AddressForm(user=user)
 
+    cart_context = get_cart_context(request)
     context = {
         'order_form': order_form,
         'address_form': address_form,
-        'total': total,
-        'cart': cart,
-        'cart_products': cart_products,
-        'cart_items': cart_items,
     }
-
+    context.update(cart_context)
     return render(request, 'checkout.html', context)
+
 
 @login_required
 def user_profile(request):
