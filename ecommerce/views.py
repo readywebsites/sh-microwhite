@@ -438,7 +438,9 @@ def wishlist_view(request):
     }
     context.update(cart_context)
     return render(request, 'wishlist.html', context)
-   @login_required
+
+
+@login_required
 def checkout(request):
     user = request.user
     cart = Cart.objects.get(user=user)
@@ -454,7 +456,36 @@ def checkout(request):
 
     # Initialize forms with None
     order_form = OrderForm()
-@@ -464,34 +479,31 @@ def checkout(request):
+    # Try to get the default address
+    default_address = Address.objects.filter(user=user, default=True).first()
+    if default_address:
+        address_form = AddressForm(user=user, instance=default_address)
+    else:
+        address_form = AddressForm(user=user)
+    shipping_address = None
+
+    print("Existing addresses queryset:")
+    for address in address_form.fields['existing_address'].queryset:
+        print(address.id, address)
+        
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST)
+        address_form = AddressForm(user, request.POST)
+
+        if 'existing_address' in request.POST:
+            address_id = request.POST['existing_address']
+            if address_id:
+                shipping_address = get_object_or_404(Address, id=address_id, user=user)
+                address_form = AddressForm(instance=shipping_address, user=user, data=request.POST)
+        else:
+            shipping_address = None
+        
+        if address_form.is_valid() and order_form.is_valid():
+            if not shipping_address:
+                shipping_address = address_form.save(commit=False)
+                shipping_address.user = user
+                shipping_address.save()
+
             order = order_form.save(commit=False)
             order.user = user
             order.shipping_address = shipping_address
@@ -477,7 +508,6 @@ def checkout(request):
         order_form = OrderForm()
         address_form = AddressForm(user=user)
 
-
     context = {
         'order_form': order_form,
         'address_form': address_form,
@@ -488,7 +518,6 @@ def checkout(request):
     }
 
     return render(request, 'checkout.html', context)
-
 
 @login_required
 def user_profile(request):
