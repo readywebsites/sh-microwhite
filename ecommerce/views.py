@@ -119,43 +119,7 @@ def initiate_cashfree_payment(request):
 
 
 # Cashfree callback to mark order as paid
-@csrf_exempt
-def cashfree_callback(request):
-    order_id = request.GET.get('order_id')
-    if not order_id:
-        return JsonResponse({'error': 'Order ID missing'}, status=400)
 
-    try:
-        order = Order.objects.get(id=order_id)
-
-        # Set up Cashfree SDK again
-        Cashfree.XClientId = settings.CASHFREE_APP_ID
-        Cashfree.XClientSecret = settings.CASHFREE_API_SECRET
-        Cashfree.XEnvironment = Cashfree.SANDBOX if settings.DEBUG else Cashfree.PRODUCTION
-        x_api_version = "2023-08-01"
-
-        # Fetch and verify order status
-        api_response = Cashfree().PGFetchOrder(x_api_version, f"order_{order.id}", None)
-
-        if api_response and api_response.data.order_status == "PAID":
-            order.payment_status = 'paid'
-            order.status = 'processing'
-            order.save()
-
-            # Optionally clear cart
-            if order.user:
-                cart = Cart.objects.filter(user=order.user).first()
-                if cart:
-                    cart.products.clear()
-
-            return redirect('order_confirmation', order_id=order.id)
-        else:
-            return JsonResponse({'error': 'Payment not completed or failed'}, status=400)
-
-    except Order.DoesNotExist:
-        return JsonResponse({'error': 'Order not found'}, status=404)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
     
 from django.shortcuts import redirect, render,get_object_or_404
 from .models import Cart, Product, CartProduct,Currency,Wishlist, Order,OrderProduct,UserProfile, Address,Coupon
