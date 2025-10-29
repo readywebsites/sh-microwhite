@@ -97,12 +97,14 @@
                                                         <tbody>
 {% if orders %}
     {% for order in orders %}
+        {% if order.payment_status == 'paid' %}
         <tr>
             <td>{{ order.get_invoice_number }}</td>
             <td>{{ order.created_at }}</td>
             <td>${{ order.get_total_price }}</td>
             <td><a href="{% url 'invoice' order.pk %}">View</a></td>
         </tr>
+        {% endif %}
     {% endfor %}
 {% else %}
     <tr>
