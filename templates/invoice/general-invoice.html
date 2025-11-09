@@ -35,11 +35,16 @@
           <div class="cs-invoice_left">
             <b class="cs-primary_color">Invoice To:</b>
             <p>
-              RosebestLLC<br>
-Farmington Hills,MI 48336<br>
-Ph: 248 943 3905<br>
-Email – info@rosebest.com<br>
-                          </p>
+              {{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
+              {{ order.shipping_address.address_line_1 }}<br>
+              {% if order.shipping_address.address_line_2 %}
+                {{ order.shipping_address.address_line_2 }}<br>
+              {% endif %}
+              {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zipcode }}<br>
+              {{ order.shipping_address.country }}<br>
+              Ph: {{ order.shipping_address.phone }}<br>
+              Email: {{ order.shipping_address.email }}
+            </p>
           </div>
           <div class="cs-invoice_right cs-text_right">
             <b class="cs-primary_color">Pay To:</b>
@@ -74,41 +79,22 @@ Email – info@rosebest.com<br>
                     <td class="cs-width_2 cs-text_right">$ {{ order_product.quantity|multiply:order_product.product.price }}</td>
                   </tr>
                   {% endfor %}
-                  <tr>
-                    <td class="cs-width_3">Ui/UX Design</td>
-                    <td class="cs-width_4">Responsive Web design for all modes,ensuring aesthetics, and user experience</td>
-                    <td class="cs-width_2">1</td>
-                    <td class="cs-width_1">INR 6000/-</td>
-                    <td class="cs-width_2 cs-text_right">INR 6000/-</td>
-                  </tr>
-                  <tr>
-                    <td class="cs-width_3">Shopify Development</td>
-                    <td class="cs-width_4">Enhance your online store's functionality</td>
-                    <td class="cs-width_2">1</td>
-                    <td class="cs-width_1">INR 6000/-</td>
-                    <td class="cs-width_2 cs-text_right">INR 6000/-</td>
-                  </tr>
                 </tbody>
               </table>
             </div>
             <div class="cs-invoice_footer cs-border_top">
               <div class="cs-left_footer cs-mobile_hide">
                 <p class="cs-mb0"><b class="cs-primary_color">Additional Information:</b></p>
-                <p class="cs-m0"> 1: Additional work other than this will be charged extra.
-</p>
-                <p class="cs-m0"> 2: Development time : 20-22 days
-</p>
-                <p class="cs-m0"> 3: In case of Shopify incompatibility, you can opt for a custom website on a dedicated Ubuntu server for an additional Rs. 4000.
-</p>
+                <p class="cs-m0">Thank you for your business!</p>
               </div>
               <div class="cs-right_footer">
                 <table>
                   <tbody>
                     <tr class="cs-border_left">
                       <td class="cs-width_3 cs-semi_bold cs-primary_color cs-focus_bg">Subtoal</td>
-                      <td class="cs-width_3 cs-semi_bold cs-focus_bg cs-primary_color cs-text_right">INR 16,000/-</td>
+                      <td class="cs-width_3 cs-semi_bold cs-focus_bg cs-primary_color cs-text_right">$ {{ order.total_price }}</td>
                     </tr>
-                                      </tbody>
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -120,7 +106,7 @@ Email – info@rosebest.com<br>
                 <tbody>
                   <tr class="cs-border_none">
                     <td class="cs-width_3 cs-border_top_0 cs-bold cs-f16 cs-primary_color">Total Amount</td>
-                    <td class="cs-width_3 cs-border_top_0 cs-bold cs-f16 cs-primary_color cs-text_right">INR 16,000/-</td>
+                    <td class="cs-width_3 cs-border_top_0 cs-bold cs-f16 cs-primary_color cs-text_right">$ {{ order.total_price }}</td>
                   </tr>
                 </tbody>
               </table>

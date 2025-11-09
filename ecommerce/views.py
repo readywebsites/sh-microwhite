@@ -623,7 +623,7 @@ def get_address_details(request):
         'last_name': address.last_name,
         'email': address.email,
         'address_line_1': address.address_line_1,
-        'country': address.country.code,  # Ensure this is the country code
+        'country': str(address.country),  # Ensure this is the country code
         'state': address.state,
         'city': address.city,
         'zipcode': address.zipcode,
