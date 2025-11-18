@@ -104,23 +104,13 @@
 
                                                                         <!-- Select Existing Address Section -->
                                                                         <div class="row">
-                                                                            <div class="col-md-12">
-                                                                                <div class="input-item">
-                                                                                    <label for="id_existing_address">Returning customer?</label> 
-                                                                                    <select id="id_existing_address" name="existing_address" class="custom-dropdown">
-                                                                                        <!-- Placeholder option -->
-                                                                                        <option value="" {% if not address_form.instance.pk %}selected{% endif %}>
-                                                                                            {{ address_form.fields.existing_address.empty_label }}
-                                                                                        </option>
-                                                                                        
-                                                                                        <!-- Existing addresses options -->
-                                                                                        {% for address in address_form.fields.existing_address.queryset %}
-                                                                                            <option value="{{ address.id }}">{{ address }}</option>
-                                                                                        {% endfor %}
-                                                                                    </select>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
+    <div class="col-md-12">
+        <div class="input-item">
+            <label for="id_existing_address">Returning customer?</label> 
+            {{ address_form.existing_address|add_class:"custom-dropdown" }}
+        </div>
+    </div>
+</div>
                                     <!-- Personal Information Section -->
                                     <div class="row">
 
